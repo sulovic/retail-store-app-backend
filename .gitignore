@@ -1,0 +1,21 @@
+# Ignore environment variables
+.env
+
+# Ignore node_modules
+node_modules
+
+# Ignore Prisma client and migrations
+prisma/client
+prisma/migrations
+
+# Ignore Logs
+logs
+*.log
+
+# Build directories
+dist
+build
+
+# Public and static files
+public
+uploads
