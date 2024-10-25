@@ -1,11 +1,11 @@
 {
   "compilerOptions": {
     "target": "es2022",
-    "module": "es2022",
+    "module": "NodeNext",
     "strict": true,
     "esModuleInterop": true,
     "forceConsistentCasingInFileNames": true,
-    "moduleResolution": "node",
+    "moduleResolution": "NodeNext",
     "outDir": "./dist",
     "baseUrl": ".",
     "paths": {

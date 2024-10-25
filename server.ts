@@ -4,6 +4,7 @@ import path from "path";
 import { fileURLToPath } from "url";
 import corsConfig from "./config/cors.js";
 import cookieParser from "cookie-parser";
+import errorHandler from "./middleware/errorHandling.js";
 
 // Import routes
 
@@ -38,10 +39,6 @@ app.use("/api/products", productRoutes);
 app.use("/api/userRoles", userRoleRoutes);
 app.use("/api/users", userRoutes);
 
-
-app.use((err: any, req: Request, res: Response, next: NextFunction) => {
-  console.error(err.stack);
-  res.status(500).json({ error: "Internal server error" });
-});
+app.use(errorHandler);
 
 app.listen(PORT, () => console.log(`Server listening on port ${PORT}`));
