@@ -2,10 +2,10 @@ import userRolesModel from "../models/userRole.js";
 import { Request, Response, NextFunction } from "express";
 import { UserRoles } from "@prisma/client";
 
-const getAllUserRolesController = async (req: Request, res: Response, next: NextFunction) => {
+const getAllUserRolesController = async (req: Request, res: Response, next: NextFunction): Promise<Response<any> | void> => {
   try {
     const userRoles: UserRoles[] = await userRolesModel.getAllUserRoles();
-    res.status(200).json(userRoles);
+    return res.status(200).json(userRoles);
   } catch (error) {
     next(error);
   }

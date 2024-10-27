@@ -11,6 +11,8 @@ import errorHandler from "./middleware/errorHandling.js";
 import productRoutes from "./routes/productRoutes.js";
 import userRoleRoutes from "./routes/userRoleRoutes.js";
 import userRoutes from "./routes/userRoutes.js";
+import loginRoute from "./routes/auth/loginRoute.js";
+import logoutRoute from "./routes/auth/logoutRoute.js";
 
 const app = express();
 const PORT: number = process.env.PORT ? parseInt(process.env.PORT) : 5000;
@@ -28,6 +30,9 @@ app.use(cookieParser());
 app.use(express.static(path.join(__dirname, "public")));
 
 // Auth routes
+app.use("/login", loginRoute);
+app.use("/logout", logoutRoute);
+
 // app.use("/login", rateLimiter(3, 10), require("./routes/auth/login"));
 // app.use("/login", require("./routes/auth/login"));
 // app.use("/logout", require("./routes/auth/logout"));

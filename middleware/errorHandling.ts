@@ -1,7 +1,7 @@
 import { Request, Response, NextFunction, ErrorRequestHandler } from "express";
 import { Prisma } from "@prisma/client";
 
-const errorHandler: ErrorRequestHandler = (err: any, req: Request, res: Response, next: NextFunction) => {
+const errorHandler: ErrorRequestHandler = (err: any, req: Request, res: Response, next: NextFunction) : void => {
   // Implement Error Logger
   console.error("Error:", err);
 
@@ -48,6 +48,12 @@ const errorHandler: ErrorRequestHandler = (err: any, req: Request, res: Response
     return;
   }
   //Handle other specific errors
+      // errorLogger(err, req);
+    // if (err.name === "InvalidGoogleToken") {
+    //   return res.status(401).json({ error: "Unauthorized - Invalid Google Token" });
+    // } else {
+    //   res.status(500).json({ error: "Internal Server Error" });
+    // }
 
   res.status(err.statusCode || 500).json({
     message: err.message || "Internal Server Error",

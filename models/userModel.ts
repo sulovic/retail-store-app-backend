@@ -2,26 +2,47 @@ import { PrismaClient, Users } from "@prisma/client";
 
 const prisma = new PrismaClient();
 
-const getAllUsers = async (): Promise<Users[]> => {
+type UserPublicDataType = Omit<Users, "password" | "refreshToken" | "roleId" | "createdAt">
+
+
+const getAllUsers = async (): Promise<UserPublicDataType[]> => {
   return await prisma.users.findMany({
-    include: {
-      UserRoles: true,
+    select: {
+      userId: true,
+      firstName: true,
+      lastName: true,
+      email: true,
+      UserRoles: {
+        select: {
+          roleName: true,
+          roleId: true,
+        },
+      },
     },
   });
 };
 
-const getUser = async (userId: number): Promise<Users | null> => {
+const getUser = async (userId: number): Promise<UserPublicDataType | null> => {
   return await prisma.users.findUnique({
     where: {
       userId,
     },
-    include: {
-      UserRoles: true,
+    select: {
+      userId: true,
+      firstName: true,
+      lastName: true,
+      email: true,
+      UserRoles: {
+        select: {
+          roleName: true,
+          roleId: true,
+        },
+      },
     },
   });
 };
 
-const createUser = async (user: Omit<Users, "userId">): Promise<Users> => {
+const createUser = async (user: Omit<Users, "userId">): Promise<UserPublicDataType> => {
   return await prisma.users.create({
     data: {
       firstName: user?.firstName,
@@ -33,10 +54,22 @@ const createUser = async (user: Omit<Users, "userId">): Promise<Users> => {
         },
       },
     },
+    select: {
+      userId: true,
+      firstName: true,
+      lastName: true,
+      email: true,
+      UserRoles: {
+        select: {
+          roleName: true,
+          roleId: true,
+        },
+      },
+    },
   });
 };
 
-const updateUser = async (user: Users): Promise<Users> => {
+const updateUser = async (user: Users): Promise<UserPublicDataType> => {
   return await prisma.users.update({
     where: {
       userId: user?.userId,
@@ -51,13 +84,37 @@ const updateUser = async (user: Users): Promise<Users> => {
         },
       },
     },
+    select: {
+      userId: true,
+      firstName: true,
+      lastName: true,
+      email: true,
+      UserRoles: {
+        select: {
+          roleName: true,
+          roleId: true,
+        },
+      },
+    },
   });
 };
 
-const deleteUser = async (userId: number): Promise<Users> => {
+const deleteUser = async (userId: number): Promise<UserPublicDataType> => {
   return await prisma.users.delete({
     where: {
       userId,
+    },
+    select: {
+      userId: true,
+      firstName: true,
+      lastName: true,
+      email: true,
+      UserRoles: {
+        select: {
+          roleName: true,
+          roleId: true,
+        },
+      },
     },
   });
 };
