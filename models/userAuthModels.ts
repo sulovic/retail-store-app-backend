@@ -9,18 +9,17 @@ export const getAuthUser = async (email: string): Promise<Users | null> => {
     },
     include: {
       UserRoles: true,
-    }
-    
+    },
   });
 };
 
 export const removeAuthUserToken = async (email: string): Promise<Users | null> => {
   return await prisma.users.update({
     where: {
-      email
+      email,
     },
     data: {
-      refreshToken: null
-    }
-  })
-}
+      refreshToken: null,
+    },
+  });
+};

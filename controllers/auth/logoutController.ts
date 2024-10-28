@@ -1,21 +1,22 @@
 import { Request, Response, NextFunction } from "express";
 import { Users } from "@prisma/client";
 import jwt from "jsonwebtoken";
-type UserPublicDataType = Omit<Users, "password" | "refreshToken" | "roleId" | "createdAt">;
 
 import { removeAuthUserToken } from "../../models/userAuthModels.js";
+
+type UserPublicDataType = Omit<Users, "password" | "refreshToken" | "roleId" | "createdAt">;
 
 const logoutController = async (req: Request, res: Response, next: NextFunction): Promise<Response<any> | void> => {
   try {
     const refreshToken: string = req?.cookies?.refreshToken;
 
     if (!refreshToken) {
-      return res.status(401).json({ error: "Unauthorized - No Refresh Token presented" });
+      return res.status(401).json({ message: "Unauthorized - No Refresh Token presented" });
     }
 
     //Verify refreshToken
 
-    const decodedRefreshToken = jwt.verify(refreshToken, process.env.REFRESH_TOKEN_SECRET as string) as Users
+    const decodedRefreshToken = jwt.verify(refreshToken, process.env.REFRESH_TOKEN_SECRET as string) as UserPublicDataType;
 
     // Delete refreshToken from DB
 
