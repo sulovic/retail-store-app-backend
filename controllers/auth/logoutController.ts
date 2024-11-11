@@ -2,7 +2,7 @@ import { Request, Response, NextFunction } from "express";
 import { Users } from "@prisma/client";
 import jwt from "jsonwebtoken";
 
-import { removeAuthUserToken } from "../../models/userAuthModels.js";
+import { removeRefreshToken } from "../../models/userAuthModels.js";
 
 type UserPublicDataType = Omit<Users, "password" | "refreshToken" | "roleId" | "createdAt">;
 
@@ -20,15 +20,16 @@ const logoutController = async (req: Request, res: Response, next: NextFunction)
 
     // Delete refreshToken from DB
 
-    await removeAuthUserToken(decodedRefreshToken?.email);
+    await removeRefreshToken(decodedRefreshToken?.email);
 
     // Remove refreshToken httpOnly cookie
+    const isProduction = process.env.NODE_ENV === "production";
 
     res
       .clearCookie("refreshToken", {
         httpOnly: true,
-        secure: true,
-        sameSite: "strict",
+        sameSite: isProduction ? "none" : "lax",
+        secure: isProduction,
       })
       .status(200)
       .json({ message: "Logout successful" });

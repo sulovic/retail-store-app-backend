@@ -4,7 +4,45 @@ import { Products } from "@prisma/client";
 
 const getAllProductsController = async (req: Request, res: Response, next: NextFunction): Promise<Response<any> | void> => {
   try {
-    const products: Products[] = await productModel.getAllProducts();
+    const queryParams: any = req?.query;
+
+    const { sortBy, sortOrder, limit, page, ...filters } = queryParams;
+
+    const take: number | undefined = limit ? parseInt(limit) : undefined;
+    const skip: number | undefined = page && limit ? (parseInt(page) - 1) * parseInt(limit) : undefined;
+
+    const orderBy: object | undefined =
+      sortBy && sortOrder
+        ? {
+            [sortBy]: sortOrder,
+          }
+        : undefined;
+
+    const filter: Record<string, any> = {};
+
+    for (const key in filters) {
+      const value = filters[key];
+      const values = value.split(",") as string[];
+    
+      let filterValue;
+    
+      if (values.length > 1) {
+        filterValue = {
+          in: key.includes("Id") ? values.map(v => parseInt(v)) : values,
+        };
+      } else {
+        filterValue = key.includes("Id") ? parseInt(value) : value;
+      }
+    
+      filter[key] = filterValue;
+    }
+    
+    const products: Products[] = await productModel.getAllProducts({
+      filter,
+      orderBy,
+      take,
+      skip,
+    });
     return res.status(200).json(products);
   } catch (error) {
     next(error);

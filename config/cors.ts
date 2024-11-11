@@ -3,6 +3,7 @@ const whitelist : string[] = [
     'http://localhost:3000',
     'http://localhost',
     'http://127.0.0.1',
+    'https://x5okvoq-anonymous-8081.exp.direct'
 ];
 
 type CorsCallback = (err: Error | null, allow?: boolean) => void;
@@ -11,7 +12,7 @@ type CorsCallback = (err: Error | null, allow?: boolean) => void;
 const corsConfig = {
     origin: (requestOrigin: string | undefined, callback: CorsCallback) => {
         const isWhitelistedOrigin : boolean = (requestOrigin && whitelist.includes(requestOrigin)) || !requestOrigin ;
-
+        console.log(requestOrigin)
         if (isWhitelistedOrigin) {
             callback(null, true);
         } else {

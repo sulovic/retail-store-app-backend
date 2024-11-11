@@ -49,7 +49,9 @@ model Inventories {
     inventoryDate     DateTime
     userId            Int
     Users             Users               @relation(fields: [userId], references: [userId])
-    archved           Boolean
+    storeId           Int
+    Stores            Stores              @relation(fields: [storeId], references: [storeId])
+    archived           Boolean
     InventoryProducts InventoryProducts[]
 
     @@index([inventoryId])
@@ -67,4 +69,15 @@ model InventoryProducts {
     productPrice       Float
 
     @@index([inventoryProductId, inventoryId, productId])
+}
+
+model Stores {
+    storeId      Int           @id @default(autoincrement())
+    storeName    String        @db.VarChar(64)
+    storeAddress String        @db.VarChar(128)
+    Inventories  Inventories[]
+
+    @@index([storeId])
+    @@index([storeName])
+    @@index([storeAddress])
 }

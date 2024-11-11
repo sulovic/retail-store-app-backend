@@ -1,10 +1,9 @@
 import { Request, Response, NextFunction } from "express";
 import bcrypt from "bcryptjs";
-import { Users } from "@prisma/client";
-
+import { AuthUserDataType, TokenUserDataType } from "../../types/types.js";
 import { getAuthUser } from "../../models/userAuthModels.js";
-import verifyGoogleToken from "../../middleware/verifyGoogleToken.js";
-import { generateAccessToken, generateRefreshToken } from "../../middleware/generateTokens.js";
+import verifyGoogleToken from "../../utils/verifyGoogleToken.js";
+import { generateAccessToken, generateRefreshToken } from "../../utils/generateTokens.js";
 
 const loginController = async (req: Request, res: Response, next: NextFunction): Promise<Response | void> => {
   try {
@@ -19,7 +18,7 @@ const loginController = async (req: Request, res: Response, next: NextFunction):
         return res.status(400).json({ message: "Missing email or password" });
       }
 
-      const authUser: Users | null = await getAuthUser(email);
+      const authUser: AuthUserDataType | null = await getAuthUser(email);
       if (!authUser || !authUser.password) {
         return res.status(401).json({ message: "Invalid email or user has no password" });
       }
@@ -40,7 +39,7 @@ const loginController = async (req: Request, res: Response, next: NextFunction):
         return res.status(401).json({ message: "Invalid Google credentials" });
       }
 
-      const authUser: Users | null = await getAuthUser(decodedCredential.email);
+      const authUser: AuthUserDataType | null = await getAuthUser(decodedCredential.email);
       if (!authUser) {
         return res.status(401).json({ message: "User not found" });
       }
@@ -54,17 +53,18 @@ const loginController = async (req: Request, res: Response, next: NextFunction):
   }
 };
 
-const sendAuthResponse = async (res: Response, user: Users) => {
+const sendAuthResponse = async (res: Response, user: AuthUserDataType) => {
   const { password, refreshToken, createdAt, ...userData } = user;
   const accessToken = await generateAccessToken(userData);
   const refreshTokenValue = await generateRefreshToken(userData);
+  const isProduction = process.env.NODE_ENV === "production"
 
   return res
     .cookie("refreshToken", refreshTokenValue, {
       httpOnly: true,
       maxAge: 24 * 60 * 60 * 1000,
-      sameSite: "strict",
-      secure: true,
+      sameSite: isProduction ? "none" : "lax",
+      secure: isProduction,
     })
     .status(200)
     .json({ accessToken });

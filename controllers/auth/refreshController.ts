@@ -1,11 +1,10 @@
 import { Request, Response, NextFunction } from "express";
-import { Users } from "@prisma/client";
+import { UserPublicDataType, AuthUserDataType } from "types/types.js";
 import jwt from "jsonwebtoken";
 
 import { getAuthUser } from "../../models/userAuthModels.js";
-import { generateAccessToken } from "../../middleware/generateTokens.js";
+import { generateAccessToken } from "../../utils/generateTokens.js";
 
-type UserPublicDataType = Omit<Users, "password" | "refreshToken" | "roleId" | "createdAt">;
 
 const refreshController = async (req: Request, res: Response, next: NextFunction): Promise<Response<any> | void> => {
   try {
@@ -21,7 +20,7 @@ const refreshController = async (req: Request, res: Response, next: NextFunction
 
     // Check if the provided refresh token matches the one stored in the database
 
-    const authUser: Users | null = await getAuthUser(decodedRefreshToken?.email);
+    const authUser: AuthUserDataType | null = await getAuthUser(decodedRefreshToken?.email);
 
     if (!authUser) {
       return res.status(401).json({ message: "User not found" });

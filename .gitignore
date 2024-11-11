@@ -19,3 +19,6 @@ build
 # Public and static files
 public
 uploads
+
+#Pem files
+*.pem

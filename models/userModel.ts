@@ -1,9 +1,7 @@
 import { PrismaClient, Users } from "@prisma/client";
+import { UserPublicDataType } from "../types/types.js";
 
 const prisma = new PrismaClient();
-
-type UserPublicDataType = Omit<Users, "password" | "refreshToken" | "roleId" | "createdAt">
-
 
 const getAllUsers = async (): Promise<UserPublicDataType[]> => {
   return await prisma.users.findMany({
@@ -42,7 +40,7 @@ const getUser = async (userId: number): Promise<UserPublicDataType | null> => {
   });
 };
 
-const createUser = async (user: Omit<Users, "userId">): Promise<UserPublicDataType> => {
+const createUser = async (user: Omit<UserPublicDataType, "userId">): Promise<UserPublicDataType> => {
   return await prisma.users.create({
     data: {
       firstName: user?.firstName,
@@ -50,7 +48,7 @@ const createUser = async (user: Omit<Users, "userId">): Promise<UserPublicDataTy
       email: user?.email,
       UserRoles: {
         connect: {
-          roleId: user?.roleId,
+          roleId: user?.UserRoles.roleId,
         },
       },
     },
@@ -69,7 +67,7 @@ const createUser = async (user: Omit<Users, "userId">): Promise<UserPublicDataTy
   });
 };
 
-const updateUser = async (user: Users): Promise<UserPublicDataType> => {
+const updateUser = async (user: UserPublicDataType): Promise<UserPublicDataType> => {
   return await prisma.users.update({
     where: {
       userId: user?.userId,
@@ -80,7 +78,7 @@ const updateUser = async (user: Users): Promise<UserPublicDataType> => {
       email: user?.email,
       UserRoles: {
         connect: {
-          roleId: user?.roleId,
+          roleId: user?.UserRoles.roleId,
         },
       },
     },

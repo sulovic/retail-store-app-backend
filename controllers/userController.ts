@@ -1,8 +1,6 @@
 import userModel from "../models/userModel.js";
 import { Request, Response, NextFunction } from "express";
-import { Users } from "@prisma/client";
-
-type UserPublicDataType = Omit<Users, "password" | "refreshToken" | "roleId" | "createdAt">;
+import { UserPublicDataType } from "../types/types.js";
 
 const getAllUsersController = async (req: Request, res: Response, next: NextFunction): Promise<Response<any> | void> => {
   try {
@@ -32,7 +30,7 @@ const getUserController = async (req: Request, res: Response, next: NextFunction
 
 const createUserController = async (req: Request, res: Response, next: NextFunction): Promise<Response<any> | void> => {
   try {
-    const user: Omit<Users, "productId"> = req.body;
+    const user: Omit<UserPublicDataType, "userId"> = req.body;
     const newUser: UserPublicDataType = await userModel.createUser(user);
     return res.status(201).json(newUser);
   } catch (err) {
@@ -42,7 +40,7 @@ const createUserController = async (req: Request, res: Response, next: NextFunct
 
 const updateUserController = async (req: Request, res: Response, next: NextFunction): Promise<Response<any> | void> => {
   try {
-    const user: Users = req.body;
+    const user: UserPublicDataType = req.body;
     const updatedUser: UserPublicDataType = await userModel.updateUser(user);
     return res.status(200).json(updatedUser);
   } catch (err) {

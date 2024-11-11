@@ -1,29 +1,32 @@
 import { PrismaClient, Products } from "@prisma/client";
 
-
-
 const prisma = new PrismaClient();
 
-const getAllProducts = async () : Promise<Products []> => {
-  return await prisma.products.findMany();
+const getAllProducts = async ({ filter, orderBy, take, skip }: { filter?: object; orderBy?: object; take?: number; skip?: number }): Promise<Products[]> => {
+  return await prisma.products.findMany({
+    where: filter,
+    orderBy,
+    take,
+    skip,
+  });
 };
 
-const getProduct = async (productId: number) : Promise<Products | null> => {
-    return await prisma.products.findUnique({
+const getProduct = async (productId: number): Promise<Products | null> => {
+  return await prisma.products.findUnique({
     where: {
       productId,
     },
   });
 };
 
-const createProduct = async (product: Omit<Products, 'productId'>) : Promise<Products> => {
-    return await prisma.products.create({
+const createProduct = async (product: Omit<Products, "productId">): Promise<Products> => {
+  return await prisma.products.create({
     data: product,
   });
 };
 
-const updateProduct = async (product: Products) : Promise<Products> => {
-    return await prisma.products.update({
+const updateProduct = async (product: Products): Promise<Products> => {
+  return await prisma.products.update({
     where: {
       productId: product.productId,
     },
@@ -31,8 +34,8 @@ const updateProduct = async (product: Products) : Promise<Products> => {
   });
 };
 
-const deleteProduct = async (productId: number) : Promise<Products>  => {
-    return await prisma.products.delete({
+const deleteProduct = async (productId: number): Promise<Products> => {
+  return await prisma.products.delete({
     where: {
       productId,
     },
