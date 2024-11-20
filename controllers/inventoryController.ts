@@ -31,6 +31,8 @@ const getAllInventoriesController = async (req: Request, res: Response, next: Ne
         filterValue = {
           in: key.includes("Id") ? values.map((v) => parseInt(v)) : values,
         };
+      } else if (key.includes("archived")) {
+        filterValue = value === "true";
       } else {
         filterValue = key.includes("Id") ? parseInt(value) : value;
       }

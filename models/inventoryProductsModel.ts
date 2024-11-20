@@ -65,11 +65,13 @@ const createInventoryProduct = async (inventoryProduct: Omit<InventoryProducts, 
 };
 
 const updateInventoryProduct = async (inventoryProduct: InventoryProducts): Promise<InventoryProducts> => {
+  const { inventoryProductId, ...data } = inventoryProduct;
+
   return await prisma.inventoryProducts.update({
     where: {
-      inventoryProductId: inventoryProduct.inventoryProductId,
+      inventoryProductId
     },
-    data: inventoryProduct,
+    data,
   });
 };
 

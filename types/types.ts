@@ -43,13 +43,22 @@ export type Store = {
 export type Inventory = {
   inventoryId: number;
   inventoryDate: Date;
-  Users: {
+  User: {
     userId: number;
     firstName: string;
     lastName: string;
+    email: string;
   };
   Stores: Store;
   archived: boolean;
+  InventoryAllowedUsers: {
+    Users: {
+      userId: number;
+      firstName: string;
+      lastName: string;
+      email: string;
+    };
+  }[];
 };
 
 export type InventoryProduct = {

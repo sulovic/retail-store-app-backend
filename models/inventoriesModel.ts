@@ -16,12 +16,24 @@ const getAllInventories = async ({ filter, orderBy, take, skip }: { filter?: obj
           storeAddress: true,
         },
       },
-      Users: {
+      User: {
         select: {
           userId: true,
           firstName: true,
           lastName: true,
           email: true,
+        },
+      },
+      InventoryAllowedUsers: {
+        select: {
+          Users: {
+            select: {
+              userId: true,
+              firstName: true,
+              lastName: true,
+              email: true,
+            },
+          },
         },
       },
     },
@@ -45,12 +57,24 @@ const getInventory = async (inventoryId: number): Promise<Inventory | null> => {
           storeAddress: true,
         },
       },
-      Users: {
+      User: {
         select: {
           userId: true,
           firstName: true,
           lastName: true,
           email: true,
+        },
+      },
+      InventoryAllowedUsers: {
+        select: {
+          Users: {
+            select: {
+              userId: true,
+              firstName: true,
+              lastName: true,
+              email: true,
+            },
+          },
         },
       },
     },
@@ -67,11 +91,13 @@ const createInventory = async (inventory: Omit<Inventories, "inventoryId">): Pro
 };
 
 const updateInventory = async (inventory: Inventories): Promise<Inventories> => {
+  const { inventoryId, ...data } = inventory;
+
   return await prisma.inventories.update({
     where: {
-      inventoryId: inventory.inventoryId,
+      inventoryId,
     },
-    data: inventory,
+    data,
   });
 };
 

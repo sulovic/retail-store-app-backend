@@ -20,6 +20,7 @@ import userRoleRoutes from "./routes/userRoleRoutes.js";
 import userRoutes from "./routes/userRoutes.js";
 import inventoryRoutes from "./routes/inventoryRoutes.js";
 import inventoryProductsRoutes from "./routes/InventoryProductsRoutes.js";
+import inventoryAllowedUserRoutes from "./routes/inventoryAllowedUsersRoutes.js";
 
 // Initialize app and constants
 
@@ -49,6 +50,7 @@ app.use("/refresh", refreshRoute);
 app.use("/api/products", productRoutes);
 app.use("/api/inventories", inventoryRoutes);
 app.use("/api/inventory-products", inventoryProductsRoutes);
+app.use("/api/inventory-allowed-users", inventoryAllowedUserRoutes);
 app.use("/api/userRoles", userRoleRoutes);
 app.use("/api/users", userRoutes);
 

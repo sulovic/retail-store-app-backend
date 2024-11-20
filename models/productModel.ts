@@ -26,11 +26,13 @@ const createProduct = async (product: Omit<Products, "productId">): Promise<Prod
 };
 
 const updateProduct = async (product: Products): Promise<Products> => {
+  const { productId, ...data } = product;
+
   return await prisma.products.update({
     where: {
-      productId: product.productId,
+      productId,
     },
-    data: product,
+    data,
   });
 };
 
