@@ -8,14 +8,33 @@ export const getAuthUser = async (email: string): Promise<AuthUserDataType | nul
     where: {
       email,
     },
-    include: {
-      UserRoles: true,
+    select: {
+      userId: true,
+      firstName: true,
+      lastName: true,
+      email: true,
+      password: true,
+      refreshToken: true,
+      createdAt: true,
+      UserRoles: {
+        select: {
+          roleId: true,
+          roleName: true,
+        },
+      },
+      Stores: {
+        select: {
+          storeId: true,
+          storeName: true,
+          storeAddress: true,
+        },
+      },
     },
   });
 };
 
 export const removeRefreshToken = async (email: string): Promise<void> => {
-   await prisma.users.update({
+  await prisma.users.update({
     where: {
       email,
     },

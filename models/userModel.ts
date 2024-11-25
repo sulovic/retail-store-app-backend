@@ -16,6 +16,13 @@ const getAllUsers = async (): Promise<UserPublicDataType[]> => {
           roleId: true,
         },
       },
+      Stores: {
+        select: {
+          storeId: true,
+          storeName: true,
+          storeAddress: true,
+        },
+      }
     },
   });
 };
@@ -36,6 +43,13 @@ const getUser = async (userId: number): Promise<UserPublicDataType | null> => {
           roleId: true,
         },
       },
+      Stores: {
+        select: {
+          storeId: true,
+          storeName: true,
+          storeAddress: true,
+        },
+      }
     },
   });
 };
@@ -51,6 +65,9 @@ const createUser = async (user: Omit<UserPublicDataType, "userId">): Promise<Use
           roleId: user?.UserRoles.roleId,
         },
       },
+      Stores: {
+        connect: user?.Stores.map((store) => ({ storeId: store.storeId })),
+      },
     },
     select: {
       userId: true,
@@ -63,6 +80,13 @@ const createUser = async (user: Omit<UserPublicDataType, "userId">): Promise<Use
           roleId: true,
         },
       },
+      Stores: {
+        select: {
+          storeId: true,
+          storeName: true,
+          storeAddress: true,
+        },
+      }
     },
   });
 };
@@ -81,6 +105,9 @@ const updateUser = async (user: UserPublicDataType): Promise<UserPublicDataType>
           roleId: user?.UserRoles.roleId,
         },
       },
+      Stores: {
+        connect: user?.Stores.map((store) => ({ storeId: store.storeId })),
+      },
     },
     select: {
       userId: true,
@@ -93,6 +120,13 @@ const updateUser = async (user: UserPublicDataType): Promise<UserPublicDataType>
           roleId: true,
         },
       },
+      Stores: {
+        select: {
+          storeId: true,
+          storeName: true,
+          storeAddress: true,
+        },
+      }
     },
   });
 };
@@ -113,6 +147,13 @@ const deleteUser = async (userId: number): Promise<UserPublicDataType> => {
           roleId: true,
         },
       },
+      Stores: {
+        select: {
+          storeId: true,
+          storeName: true,
+          storeAddress: true,
+        },
+      }
     },
   });
 };

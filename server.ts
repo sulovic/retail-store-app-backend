@@ -3,9 +3,9 @@ import cors from "cors";
 import path from "path";
 import { fileURLToPath } from "url";
 import cookieParser from "cookie-parser";
-
 import corsConfig from "./config/cors.js";
 import errorHandler from "./middleware/errorHandling.js";
+import verifyAccessToken from "./middleware/verifyAccessToken.js";
 
 // Import auth routes
 
@@ -20,7 +20,6 @@ import userRoleRoutes from "./routes/userRoleRoutes.js";
 import userRoutes from "./routes/userRoutes.js";
 import inventoryRoutes from "./routes/inventoryRoutes.js";
 import inventoryProductsRoutes from "./routes/InventoryProductsRoutes.js";
-import inventoryAllowedUserRoutes from "./routes/inventoryAllowedUsersRoutes.js";
 
 // Initialize app and constants
 
@@ -47,12 +46,11 @@ app.use("/logout", logoutRoute);
 app.use("/refresh", refreshRoute);
 
 // Data Routes
-app.use("/api/products", productRoutes);
-app.use("/api/inventories", inventoryRoutes);
-app.use("/api/inventory-products", inventoryProductsRoutes);
-app.use("/api/inventory-allowed-users", inventoryAllowedUserRoutes);
-app.use("/api/userRoles", userRoleRoutes);
-app.use("/api/users", userRoutes);
+app.use("/api/products", verifyAccessToken("products"), productRoutes);
+app.use("/api/inventories", verifyAccessToken("inventories"), inventoryRoutes);
+app.use("/api/inventory-products", verifyAccessToken("inventoryProducts"), inventoryProductsRoutes);
+app.use("/api/user-roles", verifyAccessToken("userRoles"), userRoleRoutes);
+app.use("/api/users", verifyAccessToken("users"), userRoutes);
 
 // Error handling middleware
 

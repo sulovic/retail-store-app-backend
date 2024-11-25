@@ -7,6 +7,11 @@ export type UserPublicDataType = {
     roleId: number;
     roleName: string;
   };
+  Stores: {
+    storeId: number;
+    storeName: string;
+    storeAddress: string;
+  }[];
 };
 
 export type AuthUserDataType = {
@@ -21,6 +26,11 @@ export type AuthUserDataType = {
     roleId: number;
     roleName: string;
   };
+  Stores: {
+    storeId: number;
+    storeName: string;
+    storeAddress: string;
+  }[];
 };
 
 export type TokenUserDataType = {
@@ -38,12 +48,18 @@ export type Store = {
   storeId: number;
   storeName: string;
   storeAddress: string;
+  Users: {
+    userId: number;
+    firstName: string;
+    lastName: string;
+    email: string;
+  }[];
 };
 
 export type Inventory = {
   inventoryId: number;
   inventoryDate: Date;
-  User: {
+  Creator: {
     userId: number;
     firstName: string;
     lastName: string;
@@ -51,14 +67,6 @@ export type Inventory = {
   };
   Stores: Store;
   archived: boolean;
-  InventoryAllowedUsers: {
-    Users: {
-      userId: number;
-      firstName: string;
-      lastName: string;
-      email: string;
-    };
-  }[];
 };
 
 export type InventoryProduct = {

@@ -14,18 +14,6 @@ const getAllInventories = async ({ filter, orderBy, take, skip }: { filter?: obj
           storeId: true,
           storeName: true,
           storeAddress: true,
-        },
-      },
-      User: {
-        select: {
-          userId: true,
-          firstName: true,
-          lastName: true,
-          email: true,
-        },
-      },
-      InventoryAllowedUsers: {
-        select: {
           Users: {
             select: {
               userId: true,
@@ -33,7 +21,15 @@ const getAllInventories = async ({ filter, orderBy, take, skip }: { filter?: obj
               lastName: true,
               email: true,
             },
-          },
+          }
+        },
+      },
+      Creator: {
+        select: {
+          userId: true,
+          firstName: true,
+          lastName: true,
+          email: true,
         },
       },
     },
@@ -55,18 +51,6 @@ const getInventory = async (inventoryId: number): Promise<Inventory | null> => {
           storeId: true,
           storeName: true,
           storeAddress: true,
-        },
-      },
-      User: {
-        select: {
-          userId: true,
-          firstName: true,
-          lastName: true,
-          email: true,
-        },
-      },
-      InventoryAllowedUsers: {
-        select: {
           Users: {
             select: {
               userId: true,
@@ -74,7 +58,15 @@ const getInventory = async (inventoryId: number): Promise<Inventory | null> => {
               lastName: true,
               email: true,
             },
-          },
+          }
+        },
+      },
+      Creator: {
+        select: {
+          userId: true,
+          firstName: true,
+          lastName: true,
+          email: true,
         },
       },
     },

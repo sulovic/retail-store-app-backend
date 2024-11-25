@@ -37,9 +37,13 @@ const updateProduct = async (product: Products): Promise<Products> => {
 };
 
 const deleteProduct = async (productId: number): Promise<Products> => {
-  return await prisma.products.delete({
+  // SOFT DELETION
+  return await prisma.products.update({
     where: {
       productId,
+    },
+    data: {
+      deleted: true,
     },
   });
 };

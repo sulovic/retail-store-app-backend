@@ -1,9 +1,15 @@
 import inventoryProductsModel from "../models/inventoryProductsModel.js";
+import inventoriesModel from "../models/inventoriesModel.js";
 import { Request, Response, NextFunction } from "express";
 import { InventoryProducts } from "@prisma/client";
 import { InventoryProduct } from "../types/types.js";
+import { TokenUserDataType } from "../types/types.js";
 
-const getAllInventoryProductsController = async (req: Request, res: Response, next: NextFunction): Promise<Response<any> | void> => {
+interface AuthenticatedRequest extends Request {
+  authUser?: TokenUserDataType;
+}
+
+const getAllInventoryProductsController = async (req: AuthenticatedRequest, res: Response, next: NextFunction): Promise<Response<any> | void> => {
   try {
     const queryParams: any = req?.query;
 
@@ -38,6 +44,15 @@ const getAllInventoryProductsController = async (req: Request, res: Response, ne
       filter[key] = filterValue;
     }
 
+    // Check if the user is authorized to access all inventories, return only their inventories otherwise
+    if (!req.authUser || req.authUser.UserRoles.roleId < 3000) {
+      filter.Users = {
+        userId: req.authUser?.userId,
+      };
+    }
+
+    console.log(filter);
+
     const inventoryProducts: InventoryProduct[] = await inventoryProductsModel.getAllInventoryProducts({
       filter,
       orderBy,
@@ -50,25 +65,38 @@ const getAllInventoryProductsController = async (req: Request, res: Response, ne
   }
 };
 
-const getInventoryProductsController = async (req: Request, res: Response, next: NextFunction) => {
+const getInventoryProductsController = async (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
   try {
     const inventoryProductId: number = parseInt(req.params.inventoryProductId);
     if (isNaN(inventoryProductId)) {
       return res.status(400).json({ message: "Invalid inventory product ID" });
     }
     const inventoryProduct: InventoryProduct | null = await inventoryProductsModel.getInventoryProduct(inventoryProductId);
-    if (inventoryProduct) {
-      return res.status(200).json(inventoryProduct);
-    } else {
+
+    if (!inventoryProduct) {
       return res.status(404).json({ message: "Inventory product not found" });
     }
+
+    // Check if the user is authorized to access the inventory product
+    if (!req.authUser || (req.authUser.UserRoles.roleId < 3000 && inventoryProduct.Users.userId !== req.authUser?.userId)) {
+      return res.status(401).json({ message: "Unauthorized" });
+    }
+
+    return res.status(200).json(inventoryProduct);
   } catch (error) {
     next(error);
   }
 };
 
-const createInventoryProductsController = async (req: Request, res: Response, next: NextFunction) => {
+const createInventoryProductsController = async (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
   try {
+    const inventory = await inventoriesModel.getInventory(parseInt(req.params.inventoryId));
+    if (!inventory || inventory.archived) {
+      return res.status(404).json({ message: "Inventory not found or archived" });
+    }
+    if (!req.authUser || (req.authUser.UserRoles.roleId < 3000 && !inventory.Stores.Users.some((user) => user.userId === req.authUser?.userId))) {
+      return res.status(401).json({ message: "Unauthorized to create products in this inventory" });
+    }
     const inventoryProduct: Omit<InventoryProducts, "inventoryProductId"> = req.body;
     const newInventoryProduct: InventoryProducts = await inventoryProductsModel.createInventoryProduct(inventoryProduct);
     return res.status(201).json(newInventoryProduct);
@@ -77,8 +105,19 @@ const createInventoryProductsController = async (req: Request, res: Response, ne
   }
 };
 
-const updateInventoryProductsController = async (req: Request, res: Response, next: NextFunction) => {
+const updateInventoryProductsController = async (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
   try {
+    const inventory = await inventoriesModel.getInventory(parseInt(req.params.inventoryId));
+    if (!inventory || inventory.archived) {
+      return res.status(404).json({ message: "Inventory not found or archived" });
+    }
+    const existingInventoryProduct = await inventoryProductsModel.getInventoryProduct(parseInt(req.params.inventoryProductId));
+    if (!existingInventoryProduct) {
+      return res.status(404).json({ message: "Inventory product not found" });
+    }
+    if (!req.authUser || (req.authUser.UserRoles.roleId < 3000 && existingInventoryProduct.Users.userId !== req.authUser?.userId)) {
+      return res.status(401).json({ message: "Unauthorized to update this inventory product" });
+    }
     const inventoryProduct: InventoryProducts = req.body;
     const updatedInventoryProduct: InventoryProducts = await inventoryProductsModel.updateInventoryProduct(inventoryProduct);
     return res.status(200).json(updatedInventoryProduct);
@@ -87,9 +126,21 @@ const updateInventoryProductsController = async (req: Request, res: Response, ne
   }
 };
 
-const deleteInventoryProductsController = async (req: Request, res: Response, next: NextFunction) => {
+const deleteInventoryProductsController = async (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
   try {
+    const inventory = await inventoriesModel.getInventory(parseInt(req.params.inventoryId));
     const inventoryProductId: number = parseInt(req.params.inventoryProductId);
+
+    if (!inventory || inventory.archived) {
+      return res.status(404).json({ message: "Inventory not found or archived" });
+    }
+    const existingInventoryProduct = await inventoryProductsModel.getInventoryProduct(inventoryProductId);
+    if (!existingInventoryProduct) {
+      return res.status(404).json({ message: "Inventory product not found" });
+    }
+    if (!req.authUser || (req.authUser.UserRoles.roleId < 3000 && existingInventoryProduct.Users.userId !== req.authUser?.userId)) {
+      return res.status(401).json({ message: "Unauthorized to delete this inventory product" });
+    }
     const deletedInventoryProduct: InventoryProducts = await inventoryProductsModel.deleteInventoryProduct(inventoryProductId);
     return res.status(200).json(deletedInventoryProduct);
   } catch (error) {

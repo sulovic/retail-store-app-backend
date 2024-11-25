@@ -2,8 +2,13 @@ import inventoryModel from "../models/inventoriesModel.js";
 import { Request, Response, NextFunction } from "express";
 import { Inventories } from "@prisma/client";
 import { Inventory } from "../types/types.js";
+import { TokenUserDataType } from "../types/types.js";
 
-const getAllInventoriesController = async (req: Request, res: Response, next: NextFunction): Promise<Response<any> | void> => {
+interface AuthenticatedRequest extends Request {
+  authUser?: TokenUserDataType;
+}
+
+const getAllInventoriesController = async (req: AuthenticatedRequest, res: Response, next: NextFunction): Promise<Response<any> | void> => {
   try {
     const queryParams: any = req?.query;
 
@@ -40,6 +45,17 @@ const getAllInventoriesController = async (req: Request, res: Response, next: Ne
       filter[key] = filterValue;
     }
 
+    // Check if the user is authorized to access all inventories, return only their inventories otherwise
+    if (!req.authUser || req.authUser.UserRoles.roleId < 3000) {
+      filter.Stores = {
+        Users: {
+          some: {
+            userId: req.authUser?.userId,
+          },
+        },
+      };
+    }
+
     const inventories: Inventory[] = await inventoryModel.getAllInventories({
       filter,
       orderBy,
@@ -48,22 +64,29 @@ const getAllInventoriesController = async (req: Request, res: Response, next: Ne
     });
     return res.status(200).json(inventories);
   } catch (error) {
+    console.error(error);
     next(error);
   }
 };
 
-const getInventoryController = async (req: Request, res: Response, next: NextFunction) => {
+const getInventoryController = async (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
   try {
     const inventoryId: number = parseInt(req.params.inventoryId);
     if (isNaN(inventoryId)) {
       return res.status(400).json({ message: "Invalid inventory ID" });
     }
+
     const inventory: Inventory | null = await inventoryModel.getInventory(inventoryId);
-    if (inventory) {
-      return res.status(200).json(inventory);
-    } else {
+
+    if (!inventory) {
       return res.status(404).json({ message: "Inventory not found" });
     }
+
+    // Check if the user is authorized to access the inventory
+    if (!req.authUser || (req.authUser.UserRoles.roleId < 3000 && !inventory.Stores.Users.some((user) => user.userId === req.authUser?.userId))) {
+      return res.status(401).json({ message: "Unauthorized" });
+    }
+    return res.status(200).json(inventory);
   } catch (error) {
     next(error);
   }
