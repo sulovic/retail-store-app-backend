@@ -108,14 +108,15 @@ const createInventoryProductsController = async (req: AuthenticatedRequest, res:
 
 const updateInventoryProductsController = async (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
   try {
-    const inventory = await inventoriesModel.getInventory(parseInt(req.params.inventoryId));
-    if (!inventory || inventory.archived) {
-      return res.status(404).json({ message: "Inventory not found or archived" });
-    }
     const existingInventoryProduct = await inventoryProductsModel.getInventoryProduct(parseInt(req.params.inventoryProductId));
     if (!existingInventoryProduct) {
       return res.status(404).json({ message: "Inventory product not found" });
     }
+    const inventory = await inventoriesModel.getInventory(existingInventoryProduct.inventoryId);
+    if (!inventory || inventory.archived) {
+      return res.status(404).json({ message: "Inventory not found or archived" });
+    }
+
     if (!req.authUser || (req.authUser.UserRoles.roleId < 3000 && existingInventoryProduct.Users.userId !== req.authUser?.userId)) {
       return res.status(401).json({ message: "Unauthorized to update this inventory product" });
     }
@@ -129,15 +130,17 @@ const updateInventoryProductsController = async (req: AuthenticatedRequest, res:
 
 const deleteInventoryProductsController = async (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
   try {
-    const inventory = await inventoriesModel.getInventory(parseInt(req.params.inventoryId));
     const inventoryProductId: number = parseInt(req.params.inventoryProductId);
 
-    if (!inventory || inventory.archived) {
-      return res.status(404).json({ message: "Inventory not found or archived" });
-    }
     const existingInventoryProduct = await inventoryProductsModel.getInventoryProduct(inventoryProductId);
     if (!existingInventoryProduct) {
       return res.status(404).json({ message: "Inventory product not found" });
+    }
+
+    const inventory = await inventoriesModel.getInventory(existingInventoryProduct.inventoryId);
+
+    if (!inventory || inventory.archived) {
+      return res.status(404).json({ message: "Inventory not found or archived" });
     }
     if (!req.authUser || (req.authUser.UserRoles.roleId < 3000 && existingInventoryProduct.Users.userId !== req.authUser?.userId)) {
       return res.status(401).json({ message: "Unauthorized to delete this inventory product" });
