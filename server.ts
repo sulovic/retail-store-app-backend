@@ -20,6 +20,7 @@ import userRoleRoutes from "./routes/userRoleRoutes.js";
 import userRoutes from "./routes/userRoutes.js";
 import inventoryRoutes from "./routes/inventoryRoutes.js";
 import inventoryProductsRoutes from "./routes/InventoryProductsRoutes.js";
+import storeRoutes from "./routes/storeRoutes.js";
 
 // Initialize app and constants
 
@@ -51,6 +52,7 @@ app.use("/api/inventories", verifyAccessToken("inventories"), inventoryRoutes);
 app.use("/api/inventory-products", verifyAccessToken("inventoryProducts"), inventoryProductsRoutes);
 app.use("/api/user-roles", verifyAccessToken("userRoles"), userRoleRoutes);
 app.use("/api/users", verifyAccessToken("users"), userRoutes);
+app.use("/api/stores", verifyAccessToken("stores"), storeRoutes);
 
 // Error handling middleware
 

@@ -51,8 +51,6 @@ const getAllInventoryProductsController = async (req: AuthenticatedRequest, res:
       };
     }
 
-    console.log(filter);
-
     const inventoryProducts: InventoryProduct[] = await inventoryProductsModel.getAllInventoryProducts({
       filter,
       orderBy,
@@ -90,14 +88,17 @@ const getInventoryProductsController = async (req: AuthenticatedRequest, res: Re
 
 const createInventoryProductsController = async (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
   try {
-    const inventory = await inventoriesModel.getInventory(parseInt(req.params.inventoryId));
+    const inventoryProduct: Omit<InventoryProducts, "inventoryProductId"> = req.body;
+
+    const inventory = await inventoriesModel.getInventory(inventoryProduct.inventoryId);
     if (!inventory || inventory.archived) {
       return res.status(404).json({ message: "Inventory not found or archived" });
     }
     if (!req.authUser || (req.authUser.UserRoles.roleId < 3000 && !inventory.Stores.Users.some((user) => user.userId === req.authUser?.userId))) {
       return res.status(401).json({ message: "Unauthorized to create products in this inventory" });
     }
-    const inventoryProduct: Omit<InventoryProducts, "inventoryProductId"> = req.body;
+    // Set the user ID if not provided
+    inventoryProduct.userId = req.authUser.userId;
     const newInventoryProduct: InventoryProducts = await inventoryProductsModel.createInventoryProduct(inventoryProduct);
     return res.status(201).json(newInventoryProduct);
   } catch (error) {

@@ -64,7 +64,6 @@ const getAllInventoriesController = async (req: AuthenticatedRequest, res: Respo
     });
     return res.status(200).json(inventories);
   } catch (error) {
-    console.error(error);
     next(error);
   }
 };
@@ -92,9 +91,14 @@ const getInventoryController = async (req: AuthenticatedRequest, res: Response, 
   }
 };
 
-const createInventoryController = async (req: Request, res: Response, next: NextFunction) => {
+const createInventoryController = async (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
   try {
     const inventory: Omit<Inventories, "inventoryId"> = req.body;
+    if (!req.authUser) {
+      return res.status(401).json({ message: "Unauthorized" });
+    }
+    // Set the user ID if not provided
+    inventory.creatorId = req.authUser.userId;
     const newInventory: Inventories = await inventoryModel.createInventory(inventory);
     return res.status(201).json(newInventory);
   } catch (error) {
