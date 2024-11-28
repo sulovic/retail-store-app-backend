@@ -22,7 +22,7 @@ const getAllUsers = async (): Promise<UserPublicDataType[]> => {
           storeName: true,
           storeAddress: true,
         },
-      }
+      },
     },
   });
 };
@@ -49,7 +49,7 @@ const getUser = async (userId: number): Promise<UserPublicDataType | null> => {
           storeName: true,
           storeAddress: true,
         },
-      }
+      },
     },
   });
 };
@@ -86,7 +86,7 @@ const createUser = async (user: Omit<UserPublicDataType, "userId">): Promise<Use
           storeName: true,
           storeAddress: true,
         },
-      }
+      },
     },
   });
 };
@@ -106,6 +106,7 @@ const updateUser = async (user: UserPublicDataType): Promise<UserPublicDataType>
         },
       },
       Stores: {
+        set: [],
         connect: user?.Stores.map((store) => ({ storeId: store.storeId })),
       },
     },
@@ -126,7 +127,7 @@ const updateUser = async (user: UserPublicDataType): Promise<UserPublicDataType>
           storeName: true,
           storeAddress: true,
         },
-      }
+      },
     },
   });
 };
@@ -153,7 +154,7 @@ const deleteUser = async (userId: number): Promise<UserPublicDataType> => {
           storeName: true,
           storeAddress: true,
         },
-      }
+      },
     },
   });
 };

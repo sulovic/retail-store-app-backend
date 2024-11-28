@@ -21,7 +21,7 @@ const getAllInventories = async ({ filter, orderBy, take, skip }: { filter?: obj
               lastName: true,
               email: true,
             },
-          }
+          },
         },
       },
       Creator: {
@@ -37,6 +37,12 @@ const getAllInventories = async ({ filter, orderBy, take, skip }: { filter?: obj
     orderBy,
     take,
     skip,
+  });
+};
+
+const getAllInventoriesCount = async ({ filter }: { filter?: object }): Promise<number> => {
+  return await prisma.inventories.count({
+    where: filter,
   });
 };
 
@@ -58,7 +64,7 @@ const getInventory = async (inventoryId: number): Promise<Inventory | null> => {
               lastName: true,
               email: true,
             },
-          }
+          },
         },
       },
       Creator: {
@@ -103,6 +109,7 @@ const deleteInventory = async (inventoryId: number): Promise<Inventories> => {
 
 export default {
   getAllInventories,
+  getAllInventoriesCount,
   getInventory,
   createInventory,
   updateInventory,

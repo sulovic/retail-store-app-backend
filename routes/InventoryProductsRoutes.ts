@@ -4,6 +4,7 @@ import inventoryProductsController from "../controllers/inventoryProductsControl
 const router = Router();
 
 router.get("/", inventoryProductsController.getAllInventoryProductsController);
+router.get("/count", inventoryProductsController.getAllInventoryProductsCountController);
 router.get("/:inventoryProductId", inventoryProductsController.getInventoryProductsController);
 router.post("/", inventoryProductsController.createInventoryProductsController);
 router.put("/:inventoryProductId", inventoryProductsController.updateInventoryProductsController);

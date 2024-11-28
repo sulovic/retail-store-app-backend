@@ -11,6 +11,12 @@ const getAllProducts = async ({ filter, orderBy, take, skip }: { filter?: object
   });
 };
 
+const getAllProductsCount = async ({ filter }: { filter?: object }): Promise<number> => {
+  return await prisma.products.count({
+    where: filter,
+  });
+};
+
 const getProduct = async (productId: number): Promise<Products | null> => {
   return await prisma.products.findUnique({
     where: {
@@ -50,6 +56,7 @@ const deleteProduct = async (productId: number): Promise<Products> => {
 
 export default {
   getAllProducts,
+  getAllProductsCount,
   getProduct,
   createProduct,
   updateProduct,

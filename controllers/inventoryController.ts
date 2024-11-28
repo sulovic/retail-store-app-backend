@@ -68,6 +68,52 @@ const getAllInventoriesController = async (req: AuthenticatedRequest, res: Respo
   }
 };
 
+const getAllInventoriesCountController = async (req: AuthenticatedRequest, res: Response, next: NextFunction): Promise<Response<any> | void> => {
+  try {
+
+    const queryParams: any = req?.query;
+
+    const { sortBy, sortOrder, limit, page, ...filters } = queryParams;
+
+    const filter: Record<string, any> = {};
+
+    for (const key in filters) {
+      const value = filters[key];
+      const values = value.split(",") as string[];
+
+      let filterValue;
+
+      if (values.length > 1) {
+        filterValue = {
+          in: key.includes("Id") ? values.map((v) => parseInt(v)) : values,
+        };
+      } else if (key.includes("archived")) {
+        filterValue = value === "true";
+      } else {
+        filterValue = key.includes("Id") ? parseInt(value) : value;
+      }
+
+      filter[key] = filterValue;
+    }
+
+    // Check if the user is authorized to access all inventories, return only their inventories otherwise
+    if (!req.authUser || req.authUser.UserRoles.roleId < 3000) {
+      filter.Stores = {
+        Users: {
+          some: {
+            userId: req.authUser?.userId,
+          },
+        },
+      };
+    }
+
+    const count: number = await inventoryModel.getAllInventoriesCount(filter);
+    return res.status(200).json({ count });
+  } catch (error) {
+    next(error);
+  }
+};
+
 const getInventoryController = async (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
   try {
     const inventoryId: number = parseInt(req.params.inventoryId);
@@ -128,6 +174,7 @@ const deleteInventoryController = async (req: Request, res: Response, next: Next
 
 export default {
   getAllInventoriesController,
+  getAllInventoriesCountController,
   getInventoryController,
   createInventoryController,
   updateInventoryController,

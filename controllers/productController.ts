@@ -49,6 +49,39 @@ const getAllProductsController = async (req: Request, res: Response, next: NextF
   }
 };
 
+const getAllProductsCountController = async (req: Request, res: Response, next: NextFunction): Promise<Response<any> | void> => {
+  try {
+    const queryParams: any = req?.query;
+
+    const { sortBy, sortOrder, limit, page, ...filters } = queryParams;
+
+    const filter: Record<string, any> = {};
+
+    for (const key in filters) {
+      const value = filters[key];
+      const values = value.split(",") as string[];
+    
+      let filterValue;
+    
+      if (values.length > 1) {
+        filterValue = {
+          in: key.includes("Id") ? values.map(v => parseInt(v)) : values,
+        };
+      } else {
+        filterValue = key.includes("Id") ? parseInt(value) : value;
+      }
+    
+      filter[key] = filterValue;
+    } 
+
+
+    const productsCount: number = await productModel.getAllProductsCount(filter);
+    return res.status(200).json({ count: productsCount });
+  } catch (error) {
+    next(error);
+  }
+};
+
 const getProductController = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const productId: number = parseInt(req.params.productId);
@@ -98,6 +131,7 @@ const deleteProductController = async (req: Request, res: Response, next: NextFu
 
 export default {
   getAllProductsController,
+  getAllProductsCountController,
   getProductController,
   createProductController,
   updateProductController,

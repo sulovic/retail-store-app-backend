@@ -4,6 +4,7 @@ import productController from "../controllers/productController.js";
 const router = Router();
 
 router.get("/", productController.getAllProductsController);
+router.get("/count", productController.getAllProductsCountController);
 router.get("/:productId", productController.getProductController);
 router.post("/", productController.createProductController);
 router.put("/:productId", productController.updateProductController);

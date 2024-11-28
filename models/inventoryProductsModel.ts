@@ -31,6 +31,12 @@ const getAllInventoryProducts = async ({ filter, orderBy, take, skip }: { filter
   });
 };
 
+const getAllInventoryProductsCount = async ({ filter }: { filter?: object }): Promise<number> => {
+  return await prisma.inventoryProducts.count({
+    where: filter,
+  });
+};
+
 const getInventoryProduct = async (inventoryProductId: number): Promise<InventoryProduct | null> => {
   return await prisma.inventoryProducts.findUnique({
     select: {
@@ -69,7 +75,7 @@ const updateInventoryProduct = async (inventoryProduct: InventoryProducts): Prom
 
   return await prisma.inventoryProducts.update({
     where: {
-      inventoryProductId
+      inventoryProductId,
     },
     data,
   });
@@ -85,6 +91,7 @@ const deleteInventoryProduct = async (inventoryProductId: number): Promise<Inven
 
 export default {
   getAllInventoryProducts,
+  getAllInventoryProductsCount,
   getInventoryProduct,
   createInventoryProduct,
   updateInventoryProduct,
