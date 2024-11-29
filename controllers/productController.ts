@@ -129,6 +129,16 @@ const deleteProductController = async (req: Request, res: Response, next: NextFu
   }
 };
 
+const bulkUploadProductsController = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const products: Omit<Products, "productId">[] = req.body;
+    const newProducts: Products[] = await productModel.bulkUploadProducts(products);
+    return res.status(201).json(newProducts);
+  } catch (error) {
+    next(error);
+  }
+};
+
 export default {
   getAllProductsController,
   getAllProductsCountController,
@@ -136,4 +146,5 @@ export default {
   createProductController,
   updateProductController,
   deleteProductController,
+  bulkUploadProductsController,
 };

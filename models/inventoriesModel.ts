@@ -33,7 +33,7 @@ const getAllInventories = async ({ filter, orderBy, take, skip }: { filter?: obj
         },
       },
     },
-    where: filter,
+    where: { ...filter, deleted: false },
     orderBy,
     take,
     skip,
@@ -42,7 +42,7 @@ const getAllInventories = async ({ filter, orderBy, take, skip }: { filter?: obj
 
 const getAllInventoriesCount = async ({ filter }: { filter?: object }): Promise<number> => {
   return await prisma.inventories.count({
-    where: filter,
+    where: { ...filter, deleted: false },
   });
 };
 
@@ -78,6 +78,7 @@ const getInventory = async (inventoryId: number): Promise<Inventory | null> => {
     },
     where: {
       inventoryId,
+      deleted: false,
     },
   });
 };
@@ -94,15 +95,21 @@ const updateInventory = async (inventory: Inventories): Promise<Inventories> => 
   return await prisma.inventories.update({
     where: {
       inventoryId,
+      deleted: false,
     },
     data,
   });
 };
 
 const deleteInventory = async (inventoryId: number): Promise<Inventories> => {
-  return await prisma.inventories.delete({
+  // SOFT DELETION
+  return await prisma.inventories.update({
     where: {
       inventoryId,
+    },
+    data: {
+      deleted: true,
+      deletedAt: new Date(),
     },
   });
 };

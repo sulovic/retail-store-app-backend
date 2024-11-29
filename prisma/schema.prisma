@@ -16,6 +16,8 @@ model Users {
     refreshToken      String?             @db.VarChar(1024)
     createdAt         DateTime            @default(now())
     roleId            Int
+    deleted           Boolean             @default(false)
+    deletedAt         DateTime?
     UserRoles         UserRoles           @relation(fields: [roleId], references: [roleId])
     InventoryProducts InventoryProducts[]
     Inventories       Inventories[]
@@ -40,7 +42,7 @@ model Products {
     productImage      String?             @db.VarChar(128)
     deleted           Boolean             @default(false)
     createdAt         DateTime            @default(now())
-    deletedAt         DateTime?           @default(now())
+    deletedAt         DateTime?
     InventoryProducts InventoryProducts[]
 
     @@index([productId])
@@ -56,6 +58,8 @@ model Inventories {
     storeId           Int
     Stores            Stores              @relation(fields: [storeId], references: [storeId])
     archived          Boolean
+    deleted           Boolean             @default(false)
+    deletedAt         DateTime?
     InventoryProducts InventoryProducts[]
 
     @@index([inventoryId])
@@ -79,6 +83,8 @@ model Stores {
     storeId      Int           @id @default(autoincrement())
     storeName    String        @db.VarChar(64)
     storeAddress String        @db.VarChar(128)
+    deleted      Boolean       @default(false)
+    deletedAt    DateTime?
     Inventories  Inventories[]
     Users        Users[]
 
@@ -86,4 +92,3 @@ model Stores {
     @@index([storeName])
     @@index([storeAddress])
 }
-

@@ -1,10 +1,13 @@
-import { PrismaClient, Users } from "@prisma/client";
+import { PrismaClient } from "@prisma/client";
 import { UserPublicDataType } from "../types/types.js";
 
 const prisma = new PrismaClient();
 
 const getAllUsers = async (): Promise<UserPublicDataType[]> => {
   return await prisma.users.findMany({
+    where: {
+      deleted: false,
+    },
     select: {
       userId: true,
       firstName: true,
@@ -31,6 +34,7 @@ const getUser = async (userId: number): Promise<UserPublicDataType | null> => {
   return await prisma.users.findUnique({
     where: {
       userId,
+      deleted: false,
     },
     select: {
       userId: true,
@@ -95,6 +99,7 @@ const updateUser = async (user: UserPublicDataType): Promise<UserPublicDataType>
   return await prisma.users.update({
     where: {
       userId: user?.userId,
+      deleted: false,
     },
     data: {
       firstName: user?.firstName,
@@ -133,15 +138,21 @@ const updateUser = async (user: UserPublicDataType): Promise<UserPublicDataType>
 };
 
 const deleteUser = async (userId: number): Promise<UserPublicDataType> => {
-  return await prisma.users.delete({
+  //Soft deletion
+  return await prisma.users.update({
     where: {
       userId,
+    },
+    data: {
+      deleted: true,
+      deletedAt: new Date(),
     },
     select: {
       userId: true,
       firstName: true,
       lastName: true,
       email: true,
+      deleted: true,
       UserRoles: {
         select: {
           roleName: true,

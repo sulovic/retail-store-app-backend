@@ -7,6 +7,7 @@ export const getAuthUser = async (email: string): Promise<AuthUserDataType | nul
   return await prisma.users.findUnique({
     where: {
       email,
+      deleted: false,
     },
     select: {
       userId: true,
@@ -37,6 +38,7 @@ export const removeRefreshToken = async (email: string): Promise<void> => {
   await prisma.users.update({
     where: {
       email,
+      deleted: false,
     },
     data: {
       refreshToken: null,
@@ -48,6 +50,7 @@ export const storeRefreshToken = async (email: string, refreshToken: string): Pr
   await prisma.users.update({
     where: {
       email,
+      deleted: false,
     },
     data: {
       refreshToken,
