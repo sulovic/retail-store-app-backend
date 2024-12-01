@@ -3,8 +3,12 @@ import { InventoryProduct } from "../types/types.js";
 
 const prisma = new PrismaClient();
 
-const getAllInventoryProducts = async ({ filter, orderBy, take, skip }: { filter?: object; orderBy?: object; take?: number; skip?: number }): Promise<InventoryProduct[]> => {
+const getAllInventoryProducts = async ({ whereClause, orderBy, take, skip }: { whereClause?: object; orderBy?: object; take?: number; skip?: number }): Promise<InventoryProduct[]> => {
   return await prisma.inventoryProducts.findMany({
+    where: whereClause,
+    orderBy,
+    take,
+    skip,
     select: {
       inventoryProductId: true,
       inventoryId: true,
@@ -21,19 +25,16 @@ const getAllInventoryProducts = async ({ filter, orderBy, take, skip }: { filter
         select: {
           productId: true,
           productName: true,
+          productBarcode: true,
         },
       },
     },
-    where: filter,
-    orderBy,
-    take,
-    skip,
   });
 };
 
-const getAllInventoryProductsCount = async ({ filter }: { filter?: object }): Promise<number> => {
+const getAllInventoryProductsCount = async ({ whereClause }: { whereClause?: object }): Promise<number> => {
   return await prisma.inventoryProducts.count({
-    where: filter,
+    where: whereClause,
   });
 };
 
@@ -55,6 +56,7 @@ const getInventoryProduct = async (inventoryProductId: number): Promise<Inventor
         select: {
           productId: true,
           productName: true,
+          productBarcode: true,
         },
       },
     },

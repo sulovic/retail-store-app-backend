@@ -3,7 +3,7 @@ import { Inventory } from "../types/types.js";
 
 const prisma = new PrismaClient();
 
-const getAllInventories = async ({ filter, orderBy, take, skip }: { filter?: object; orderBy?: object; take?: number; skip?: number }): Promise<Inventory[]> => {
+const getAllInventories = async ({ whereClause, orderBy, take, skip }: { whereClause?: object; orderBy?: object; take?: number; skip?: number }): Promise<Inventory[]> => {
   return await prisma.inventories.findMany({
     select: {
       inventoryId: true,
@@ -33,16 +33,16 @@ const getAllInventories = async ({ filter, orderBy, take, skip }: { filter?: obj
         },
       },
     },
-    where: { ...filter, deleted: false },
+    where: { ...whereClause, deleted: false },
     orderBy,
     take,
     skip,
   });
 };
 
-const getAllInventoriesCount = async ({ filter }: { filter?: object }): Promise<number> => {
+const getAllInventoriesCount = async ({ whereClause }: { whereClause?: object }): Promise<number> => {
   return await prisma.inventories.count({
-    where: { ...filter, deleted: false },
+    where: { ...whereClause, deleted: false },
   });
 };
 
@@ -106,6 +106,7 @@ const deleteInventory = async (inventoryId: number): Promise<Inventories> => {
   return await prisma.inventories.update({
     where: {
       inventoryId,
+      deleted: false,
     },
     data: {
       deleted: true,

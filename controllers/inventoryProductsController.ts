@@ -13,7 +13,7 @@ const getAllInventoryProductsController = async (req: AuthenticatedRequest, res:
   try {
     const queryParams: any = req?.query;
 
-    const { sortBy, sortOrder, limit, page, ...filters } = queryParams;
+    const { sortBy, sortOrder, limit, page, search, ...filters } = queryParams;
 
     const take: number | undefined = limit ? parseInt(limit) : undefined;
     const skip: number | undefined = page && limit ? (parseInt(page) - 1) * parseInt(limit) : undefined;
@@ -25,34 +25,46 @@ const getAllInventoryProductsController = async (req: AuthenticatedRequest, res:
           }
         : undefined;
 
-    const filter: Record<string, any> = {};
+    const createCondition = (key: string, value: string) => {
+      const values = value.split(",").map(Number);
+      return values.length === 1 ? { [key]: values[0] } : { [key]: { in: values } };
+    };
 
-    for (const key in filters) {
-      const value = filters[key];
-      const values = value.split(",") as string[];
+    const andConditions: object[] = [];
+    const andKeys = ["inventoryProductId", "inventoryId", "productId", "userId"];
 
-      let filterValue;
+    const orConditions: object[] = [];
+    const orKeys: string[] = [];
 
-      if (values.length > 1) {
-        filterValue = {
-          in: key.includes("Id") ? values.map((v) => parseInt(v)) : values,
-        };
-      } else {
-        filterValue = key.includes("Id") ? parseInt(value) : value;
+    andKeys.forEach((key) => {
+      if (filters[key]) {
+        andConditions.push(createCondition(key, filters[key]));
       }
+    });
 
-      filter[key] = filterValue;
+    orKeys.forEach((key) => {
+      if (filters[key]) {
+        orConditions.push(createCondition(key, filters[key]));
+      }
+    });
+
+    if (search) {
+      andConditions.push({
+        OR: [{ Products: { productName: { contains: search } } }, { Products: { productBarcode: { contains: search } } }, { Products: { productDesc: { contains: search } } }],
+      });
     }
-
     // Check if the user is authorized to access all inventories, return only their inventories otherwise
     if (!req.authUser || req.authUser.UserRoles.roleId < 3000) {
-      filter.Users = {
-        userId: req.authUser?.userId,
-      };
+      andConditions.push({ Users: { userId: req.authUser?.userId } });
     }
 
+    const whereClause = {
+      AND: andConditions.length > 0 ? andConditions : undefined,
+      OR: orConditions.length > 0 ? orConditions : undefined,
+    };
+
     const inventoryProducts: InventoryProduct[] = await inventoryProductsModel.getAllInventoryProducts({
-      filter,
+      whereClause,
       orderBy,
       take,
       skip,
@@ -67,36 +79,47 @@ const getAllInventoryProductsCountController = async (req: AuthenticatedRequest,
   try {
     const queryParams: any = req?.query;
 
-    const { sortBy, sortOrder, limit, page, ...filters } = queryParams;
+    const { search, ...filters } = queryParams;
 
-    const filter: Record<string, any> = {};
+    const createCondition = (key: string, value: string) => {
+      const values = value.split(",").map(Number);
+      return values.length === 1 ? { [key]: values[0] } : { [key]: { in: values } };
+    };
 
-    for (const key in filters) {
-      const value = filters[key];
-      const values = value.split(",") as string[];
+    const andConditions: object[] = [];
+    const andKeys = ["inventoryProductId", "inventoryId", "productId", "userId"];
 
-      let filterValue;
+    const orConditions: object[] = [];
+    const orKeys: string[] = [];
 
-      if (values.length > 1) {
-        filterValue = {
-          in: key.includes("Id") ? values.map((v) => parseInt(v)) : values,
-        };
-      } else {
-        filterValue = key.includes("Id") ? parseInt(value) : value;
+    andKeys.forEach((key) => {
+      if (filters[key]) {
+        andConditions.push(createCondition(key, filters[key]));
       }
+    });
 
-      filter[key] = filterValue;
+    orKeys.forEach((key) => {
+      if (filters[key]) {
+        orConditions.push(createCondition(key, filters[key]));
+      }
+    });
+
+    if (search) {
+      andConditions.push({
+        OR: [{ Products: { productName: { contains: search } } }, { Products: { productBarcode: { contains: search } } }, { Products: { productDesc: { contains: search } } }],
+      });
     }
-
     // Check if the user is authorized to access all inventories, return only their inventories otherwise
     if (!req.authUser || req.authUser.UserRoles.roleId < 3000) {
-      filter.Users = {
-        userId: req.authUser?.userId,
-      };
+      andConditions.push({ Users: { userId: req.authUser?.userId } });
     }
 
+    const whereClause = {
+      AND: andConditions.length > 0 ? andConditions : undefined,
+      OR: orConditions.length > 0 ? orConditions : undefined,
+    };
 
-    const count: number = await inventoryProductsModel.getAllInventoryProductsCount(filter);
+    const count: number = await inventoryProductsModel.getAllInventoryProductsCount({ whereClause });
     return res.status(200).json({ count });
   } catch (error) {
     next(error);

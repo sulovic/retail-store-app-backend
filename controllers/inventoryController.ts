@@ -24,40 +24,41 @@ const getAllInventoriesController = async (req: AuthenticatedRequest, res: Respo
           }
         : undefined;
 
-    const filter: Record<string, any> = {};
+    const createCondition = (key: string, value: string) => {
+      const values = value.split(",").map(Number);
+      return values.length === 1 ? { [key]: values[0] } : { [key]: { in: values } };
+    };
 
-    for (const key in filters) {
-      const value = filters[key];
-      const values = value.split(",") as string[];
+    const andConditions: object[] = [];
+    const andKeys = ["inventoryId", "storeId", "creatorId"];
 
-      let filterValue;
+    const orConditions: object[] = [];
+    const orKeys: string[] = [];
 
-      if (values.length > 1) {
-        filterValue = {
-          in: key.includes("Id") ? values.map((v) => parseInt(v)) : values,
-        };
-      } else if (key.includes("archived")) {
-        filterValue = value === "true";
-      } else {
-        filterValue = key.includes("Id") ? parseInt(value) : value;
+    andKeys.forEach((key) => {
+      if (filters[key]) {
+        andConditions.push(createCondition(key, filters[key]));
       }
+    });
 
-      filter[key] = filterValue;
-    }
+    orKeys.forEach((key) => {
+      if (filters[key]) {
+        orConditions.push(createCondition(key, filters[key]));
+      }
+    });
 
     // Check if the user is authorized to access all inventories, return only their inventories otherwise
     if (!req.authUser || req.authUser.UserRoles.roleId < 3000) {
-      filter.Stores = {
-        Users: {
-          some: {
-            userId: req.authUser?.userId,
-          },
-        },
-      };
+      andConditions.push({ AND: [{ Creator: { some: { userId: req.authUser?.userId } } }] });
     }
 
+    const whereClause = {
+      AND: andConditions.length > 0 ? andConditions : undefined,
+      OR: orConditions.length > 0 ? orConditions : undefined,
+    };
+
     const inventories: Inventory[] = await inventoryModel.getAllInventories({
-      filter,
+      whereClause,
       orderBy,
       take,
       skip,
@@ -70,44 +71,44 @@ const getAllInventoriesController = async (req: AuthenticatedRequest, res: Respo
 
 const getAllInventoriesCountController = async (req: AuthenticatedRequest, res: Response, next: NextFunction): Promise<Response<any> | void> => {
   try {
-
     const queryParams: any = req?.query;
 
-    const { sortBy, sortOrder, limit, page, ...filters } = queryParams;
+    const { ...filters } = queryParams;
 
-    const filter: Record<string, any> = {};
+    const createCondition = (key: string, value: string) => {
+      const values = value.split(",").map(Number);
+      return values.length === 1 ? { [key]: values[0] } : { [key]: { in: values } };
+    };
 
-    for (const key in filters) {
-      const value = filters[key];
-      const values = value.split(",") as string[];
+    const andConditions: object[] = [];
+    const andKeys = ["inventoryId", "storeId", "creatorId"];
 
-      let filterValue;
+    const orConditions: object[] = [];
+    const orKeys: string[] = [];
 
-      if (values.length > 1) {
-        filterValue = {
-          in: key.includes("Id") ? values.map((v) => parseInt(v)) : values,
-        };
-      } else if (key.includes("archived")) {
-        filterValue = value === "true";
-      } else {
-        filterValue = key.includes("Id") ? parseInt(value) : value;
+    andKeys.forEach((key) => {
+      if (filters[key]) {
+        andConditions.push(createCondition(key, filters[key]));
       }
+    });
 
-      filter[key] = filterValue;
-    }
+    orKeys.forEach((key) => {
+      if (filters[key]) {
+        orConditions.push(createCondition(key, filters[key]));
+      }
+    });
 
     // Check if the user is authorized to access all inventories, return only their inventories otherwise
     if (!req.authUser || req.authUser.UserRoles.roleId < 3000) {
-      filter.Stores = {
-        Users: {
-          some: {
-            userId: req.authUser?.userId,
-          },
-        },
-      };
+      andConditions.push({ AND: [{ Creator: { some: { userId: req.authUser?.userId } } }] });
     }
 
-    const count: number = await inventoryModel.getAllInventoriesCount(filter);
+    const whereClause = {
+      AND: andConditions.length > 0 ? andConditions : undefined,
+      OR: orConditions.length > 0 ? orConditions : undefined,
+    };
+
+    const count: number = await inventoryModel.getAllInventoriesCount({ whereClause });
     return res.status(200).json({ count });
   } catch (error) {
     next(error);

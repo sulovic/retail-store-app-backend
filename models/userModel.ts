@@ -3,11 +3,12 @@ import { UserPublicDataType } from "../types/types.js";
 
 const prisma = new PrismaClient();
 
-const getAllUsers = async (): Promise<UserPublicDataType[]> => {
+const getAllUsers = async ({ whereClause, orderBy, take, skip }: { whereClause?: object; orderBy?: object; take?: number; skip?: number }): Promise<UserPublicDataType[]> => {
   return await prisma.users.findMany({
-    where: {
-      deleted: false,
-    },
+    where: { ...whereClause, deleted: false },
+    orderBy,
+    take,
+    skip,
     select: {
       userId: true,
       firstName: true,
@@ -27,6 +28,12 @@ const getAllUsers = async (): Promise<UserPublicDataType[]> => {
         },
       },
     },
+  });
+};
+
+const getAllUsersCount = async ({ whereClause }: { whereClause?: object }): Promise<number> => {
+  return await prisma.users.count({
+    where: { ...whereClause, deleted: false },
   });
 };
 
@@ -142,6 +149,7 @@ const deleteUser = async (userId: number): Promise<UserPublicDataType> => {
   return await prisma.users.update({
     where: {
       userId,
+      deleted: false,
     },
     data: {
       deleted: true,
@@ -172,6 +180,7 @@ const deleteUser = async (userId: number): Promise<UserPublicDataType> => {
 
 export default {
   getAllUsers,
+  getAllUsersCount,
   getUser,
   createUser,
   updateUser,

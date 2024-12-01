@@ -6,7 +6,7 @@ const getAllProductsController = async (req: Request, res: Response, next: NextF
   try {
     const queryParams: any = req?.query;
 
-    const { sortBy, sortOrder, limit, page, ...filters } = queryParams;
+    const { sortBy, sortOrder, limit, page, search, ...filters } = queryParams;
 
     const take: number | undefined = limit ? parseInt(limit) : undefined;
     const skip: number | undefined = page && limit ? (parseInt(page) - 1) * parseInt(limit) : undefined;
@@ -18,27 +18,42 @@ const getAllProductsController = async (req: Request, res: Response, next: NextF
           }
         : undefined;
 
-    const filter: Record<string, any> = {};
+    const createCondition = (key: string, value: string) => {
+      const values = value.split(",").map(Number);
+      return values.length === 1 ? { [key]: values[0] } : { [key]: { in: values } };
+    };
 
-    for (const key in filters) {
-      const value = filters[key];
-      const values = value.split(",") as string[];
-    
-      let filterValue;
-    
-      if (values.length > 1) {
-        filterValue = {
-          in: key.includes("Id") ? values.map(v => parseInt(v)) : values,
-        };
-      } else {
-        filterValue = key.includes("Id") ? parseInt(value) : value;
+    const andConditions: object[] = [];
+    const andKeys = ["productId"];
+
+    const orConditions: object[] = [];
+    const orKeys: string[] = [];
+
+    andKeys.forEach((key) => {
+      if (filters[key]) {
+        andConditions.push(createCondition(key, filters[key]));
       }
-    
-      filter[key] = filterValue;
+    });
+
+    orKeys.forEach((key) => {
+      if (filters[key]) {
+        orConditions.push(createCondition(key, filters[key]));
+      }
+    });
+
+    if (search) {
+      andConditions.push({
+        OR: [{ productName: { contains: search } }, { productBarcode: { contains: search } }, { productDesc: { contains: search } }],
+      });
     }
-    
+
+    const whereClause = {
+      AND: andConditions.length > 0 ? andConditions : undefined,
+      OR: orConditions.length > 0 ? orConditions : undefined,
+    };
+
     const products: Products[] = await productModel.getAllProducts({
-      filter,
+      whereClause,
       orderBy,
       take,
       skip,
@@ -53,29 +68,43 @@ const getAllProductsCountController = async (req: Request, res: Response, next: 
   try {
     const queryParams: any = req?.query;
 
-    const { sortBy, sortOrder, limit, page, ...filters } = queryParams;
+    const { search, ...filters } = queryParams;
 
-    const filter: Record<string, any> = {};
+    const createCondition = (key: string, value: string) => {
+      const values = value.split(",").map(Number);
+      return values.length === 1 ? { [key]: values[0] } : { [key]: { in: values } };
+    };
 
-    for (const key in filters) {
-      const value = filters[key];
-      const values = value.split(",") as string[];
-    
-      let filterValue;
-    
-      if (values.length > 1) {
-        filterValue = {
-          in: key.includes("Id") ? values.map(v => parseInt(v)) : values,
-        };
-      } else {
-        filterValue = key.includes("Id") ? parseInt(value) : value;
+    const andConditions: object[] = [];
+    const andKeys = ["productId"];
+
+    const orConditions: object[] = [];
+    const orKeys: string[] = [];
+
+    andKeys.forEach((key) => {
+      if (filters[key]) {
+        andConditions.push(createCondition(key, filters[key]));
       }
-    
-      filter[key] = filterValue;
-    } 
+    });
 
+    orKeys.forEach((key) => {
+      if (filters[key]) {
+        orConditions.push(createCondition(key, filters[key]));
+      }
+    });
 
-    const productsCount: number = await productModel.getAllProductsCount(filter);
+    if (search) {
+      andConditions.push({
+        OR: [{ productName: { contains: search } }, { productBarcode: { contains: search } }, { productDesc: { contains: search } }],
+      });
+    }
+
+    const whereClause = {
+      AND: andConditions.length > 0 ? andConditions : undefined,
+      OR: orConditions.length > 0 ? orConditions : undefined,
+    };
+
+    const productsCount: number = await productModel.getAllProductsCount({ whereClause });
     return res.status(200).json({ count: productsCount });
   } catch (error) {
     next(error);

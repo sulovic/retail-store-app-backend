@@ -4,8 +4,108 @@ import { UserPublicDataType } from "../types/types.js";
 
 const getAllUsersController = async (req: Request, res: Response, next: NextFunction): Promise<Response<any> | void> => {
   try {
-    const users: UserPublicDataType[] = await userModel.getAllUsers();
+    const queryParams: any = req?.query;
+
+    const { sortBy, sortOrder, limit, page, search, ...filters } = queryParams;
+
+    const take: number | undefined = limit ? parseInt(limit) : undefined;
+    const skip: number | undefined = page && limit ? (parseInt(page) - 1) * parseInt(limit) : undefined;
+
+    const orderBy: object | undefined =
+      sortBy && sortOrder
+        ? {
+            [sortBy]: sortOrder,
+          }
+        : undefined;
+
+    const createCondition = (key: string, value: string) => {
+      const values = value.split(",").map(Number);
+      return values.length === 1 ? { [key]: values[0] } : { [key]: { in: values } };
+    };
+
+    const andConditions: object[] = [];
+    const andKeys = ["userId", "roleId"];
+
+    const orConditions: object[] = [];
+    const orKeys: string[] = [];
+
+    andKeys.forEach((key) => {
+      if (filters[key]) {
+        andConditions.push(createCondition(key, filters[key]));
+      }
+    });
+
+    orKeys.forEach((key) => {
+      if (filters[key]) {
+        orConditions.push(createCondition(key, filters[key]));
+      }
+    });
+
+    if (search) {
+      orConditions.push({
+        OR: [{ firstName: { contains: search } }, { lastName: { contains: search } }, { email: { contains: search } }],
+      });
+    }
+
+    const whereClause = {
+      AND: andConditions.length > 0 ? andConditions : undefined,
+      OR: orConditions.length > 0 ? orConditions : undefined,
+    };
+
+    const users: UserPublicDataType[] = await userModel.getAllUsers({
+      whereClause,
+      orderBy,
+      take,
+      skip,
+    });
     return res.status(200).json(users);
+  } catch (err) {
+    next(err);
+  }
+};
+
+const getAllUsersCountController = async (req: Request, res: Response, next: NextFunction): Promise<Response<any> | void> => {
+  try {
+    const queryParams: any = req?.query;
+
+    const { search, ...filters } = queryParams;
+
+    const createCondition = (key: string, value: string) => {
+      const values = value.split(",").map(Number);
+      return values.length === 1 ? { [key]: values[0] } : { [key]: { in: values } };
+    };
+
+    const andConditions: object[] = [];
+    const andKeys = ["userId", "roleId"];
+
+    const orConditions: object[] = [];
+    const orKeys: string[] = [];
+
+    andKeys.forEach((key) => {
+      if (filters[key]) {
+        andConditions.push(createCondition(key, filters[key]));
+      }
+    });
+
+    orKeys.forEach((key) => {
+      if (filters[key]) {
+        orConditions.push(createCondition(key, filters[key]));
+      }
+    });
+
+    if (search) {
+      orConditions.push({
+        OR: [{ firstName: { contains: search } }, { lastName: { contains: search } }, { email: { contains: search } }],
+      });
+    }
+
+    const whereClause = {
+      AND: andConditions.length > 0 ? andConditions : undefined,
+      OR: orConditions.length > 0 ? orConditions : undefined,
+    };
+
+    const usersCount: number = await userModel.getAllUsersCount({ whereClause });
+    return res.status(200).json(usersCount);
   } catch (err) {
     next(err);
   }

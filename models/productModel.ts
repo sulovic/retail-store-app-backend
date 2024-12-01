@@ -2,18 +2,18 @@ import { PrismaClient, Products } from "@prisma/client";
 
 const prisma = new PrismaClient();
 
-const getAllProducts = async ({ filter, orderBy, take, skip }: { filter?: object; orderBy?: object; take?: number; skip?: number }): Promise<Products[]> => {
+const getAllProducts = async ({ whereClause, orderBy, take, skip }: { whereClause: object; orderBy?: object; take?: number; skip?: number }): Promise<Products[]> => {
   return await prisma.products.findMany({
-    where: { ...filter, deleted: false },
+    where: { ...whereClause, deleted: false },
     orderBy,
     take,
     skip,
   });
 };
 
-const getAllProductsCount = async ({ filter }: { filter?: object }): Promise<number> => {
+const getAllProductsCount = async ({ whereClause }: { whereClause: object }): Promise<number> => {
   return await prisma.products.count({
-    where: { ...filter, deleted: false },
+    where: { ...whereClause, deleted: false },
   });
 };
 
@@ -49,6 +49,7 @@ const deleteProduct = async (productId: number): Promise<Products> => {
   return await prisma.products.update({
     where: {
       productId,
+      deleted: false,
     },
     data: {
       deleted: true,
