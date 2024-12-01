@@ -63,7 +63,7 @@ const sendAuthResponse = async (res: Response, user: AuthUserDataType) => {
     .cookie("refreshToken", refreshTokenValue, {
       httpOnly: true,
       maxAge: 24 * 60 * 60 * 1000,
-      sameSite: isProduction ? "none" : "lax",
+      sameSite: "none",
       secure: isProduction,
     })
     .status(200)

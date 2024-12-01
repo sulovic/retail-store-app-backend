@@ -28,7 +28,7 @@ const logoutController = async (req: Request, res: Response, next: NextFunction)
     res
       .clearCookie("refreshToken", {
         httpOnly: true,
-        sameSite: isProduction ? "none" : "lax",
+        sameSite: "none",
         secure: isProduction,
       })
       .status(200)
