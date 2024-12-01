@@ -23,13 +23,12 @@ const logoutController = async (req: Request, res: Response, next: NextFunction)
     await removeRefreshToken(decodedRefreshToken?.email);
 
     // Remove refreshToken httpOnly cookie
-    const isProduction = process.env.NODE_ENV === "production";
 
     res
       .clearCookie("refreshToken", {
         httpOnly: true,
         sameSite: "none",
-        secure: isProduction,
+        secure: true,
       })
       .status(200)
       .json({ message: "Logout successful" });

@@ -57,14 +57,13 @@ const sendAuthResponse = async (res: Response, user: AuthUserDataType) => {
   const { password, refreshToken, createdAt, ...userData } = user;
   const accessToken = await generateAccessToken(userData);
   const refreshTokenValue = await generateRefreshToken(userData);
-  const isProduction = process.env.NODE_ENV === "production"
 
   return res
     .cookie("refreshToken", refreshTokenValue, {
       httpOnly: true,
       maxAge: 24 * 60 * 60 * 1000,
       sameSite: "none",
-      secure: isProduction,
+      secure: true,
     })
     .status(200)
     .json({ accessToken });
