@@ -31,7 +31,7 @@ const verifyAccessToken = (route: keyof typeof priviledgesSchema) => async (req:
 
     //verify minRole route and method priviledges, fallback 5000
 
-    const minRole = priviledgesSchema[route][req.method as string] || 5000;
+    const minRole : number = priviledgesSchema[route][req.method as string] || 5000;
 
     if (decodedAccessToken.UserRoles.roleId < minRole) {
       return res.status(403).json({ error: "Forbidden - Insufficient Privileges" });

@@ -2,13 +2,13 @@ type PrivilegesSchema = Record<string, Record<string, number>>;
 
 const priviledgesSchema: PrivilegesSchema = {
   products: {
-    GET: 0,
+    GET: 1000,
     POST: 3000,
     PUT: 3000,
     DELETE: 3000,
   },
   stores: {
-    GET: 0,
+    GET: 1000,
     POST: 3000,
     PUT: 3000,
     DELETE: 3000,
