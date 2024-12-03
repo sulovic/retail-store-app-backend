@@ -90,7 +90,7 @@ const getAllInventoriesCountController = async (
   try {
     const queryParams: any = req?.query;
 
-    const { ...filters } = queryParams;
+    const { sortBy, sortOrder, limit, page, search, ...filters } = queryParams;
 
     const andKeys = ["inventoryId", "storeId", "creatorId"];
     const orKeys: string[] = [];

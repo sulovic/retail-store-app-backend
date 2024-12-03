@@ -85,7 +85,7 @@ const getAllUsersCountController = async (
   try {
     const queryParams: any = req?.query;
 
-    const { search, ...filters } = queryParams;
+    const { sortBy, sortOrder, limit, page, search, ...filters } = queryParams;
 
     const andKeys = ["userId", "roleId"];
     const orKeys: string[] = [];
