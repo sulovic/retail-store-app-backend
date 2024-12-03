@@ -40,9 +40,12 @@ const getAllInventoriesController = async (
 
     const createCondition = (key: string, value: string) => {
       const values = value.split(",").map((item) => {
+        if (key === "archived") {
+          return item.toLowerCase() === "true";
+        }
         return isNaN(Number(item)) ? item.toString() : Number(item);
       });
-      return values.length === 1 ? { [key]: values } : { [key]: { in: values } };
+      return values.length === 1 ? { [key]: values[0] } : { [key]: { in: values } };
     };
 
     const andConditions: object[] = [];
@@ -105,9 +108,12 @@ const getAllInventoriesCountController = async (
 
     const createCondition = (key: string, value: string) => {
       const values = value.split(",").map((item) => {
+        if (key === "archived") {
+          return item.toLowerCase() === "true";
+        }
         return isNaN(Number(item)) ? item.toString() : Number(item);
       });
-      return values.length === 1 ? { [key]: values } : { [key]: { in: values } };
+      return values.length === 1 ? { [key]: values[0] } : { [key]: { in: values } };
     };
 
     const andConditions: object[] = [];

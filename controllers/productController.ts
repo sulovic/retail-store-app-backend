@@ -36,7 +36,7 @@ const getAllProductsController = async (
       const values = value.split(",").map((item) => {
         return isNaN(Number(item)) ? item.toString() : Number(item);
       });
-      return values.length === 1 ? { [key]: values } : { [key]: { in: values } };
+      return values.length === 1 ? { [key]: values[0] } : { [key]: { in: values } };
     };
 
     const andConditions: object[] = [];
@@ -105,7 +105,7 @@ const getAllProductsCountController = async (
       const values = value.split(",").map((item) => {
         return isNaN(Number(item)) ? item.toString() : Number(item);
       });
-      return values.length === 1 ? { [key]: values } : { [key]: { in: values } };
+      return values.length === 1 ? { [key]: values[0] } : { [key]: { in: values } };
     };
 
     const andConditions: object[] = [];

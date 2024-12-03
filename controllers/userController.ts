@@ -36,7 +36,7 @@ const getAllUsersController = async (
       const values = value.split(",").map((item) => {
         return isNaN(Number(item)) ? item.toString() : Number(item);
       });
-      return values.length === 1 ? { [key]: values } : { [key]: { in: values } };
+      return values.length === 1 ? { [key]: values[0] } : { [key]: { in: values } };
     };
 
     const andConditions: object[] = [];
@@ -101,7 +101,7 @@ const getAllUsersCountController = async (
       const values = value.split(",").map((item) => {
         return isNaN(Number(item)) ? item.toString() : Number(item);
       });
-      return values.length === 1 ? { [key]: values } : { [key]: { in: values } };
+      return values.length === 1 ? { [key]: values[0] } : { [key]: { in: values } };
     };
 
     const andConditions: object[] = [];
