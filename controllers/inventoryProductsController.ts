@@ -9,7 +9,11 @@ interface AuthenticatedRequest extends Request {
   authUser?: TokenUserDataType;
 }
 
-const getAllInventoryProductsController = async (req: AuthenticatedRequest, res: Response, next: NextFunction): Promise<Response<any> | void> => {
+const getAllInventoryProductsController = async (
+  req: AuthenticatedRequest,
+  res: Response,
+  next: NextFunction
+): Promise<Response<any> | void> => {
   try {
     const queryParams: any = req?.query;
 
@@ -25,16 +29,25 @@ const getAllInventoryProductsController = async (req: AuthenticatedRequest, res:
           }
         : undefined;
 
+    const andKeys = ["inventoryProductId", "inventoryId", "productId", "userId"];
+    const orKeys: string[] = [];
+
+    const hasAnyAndKeys = andKeys.some((key) => key in filters);
+    const hasAnyOrKeys = orKeys.some((key) => key in filters);
+
+    if (Object.keys(filters).length > 0 && !hasAnyAndKeys && !hasAnyOrKeys) {
+      return res.status(400).json({ message: "Invalid filters provided" });
+    }
+
     const createCondition = (key: string, value: string) => {
       const values = value.split(",").map(Number);
-      return values.length === 1 ? { [key]: values[0] } : { [key]: { in: values } };
+      return values.length === 1
+        ? { [key]: key.includes("Id") ? values[0] : values[0].toString() }
+        : { [key]: { in: key.includes("Id") ? values : values.toString() } };
     };
 
     const andConditions: object[] = [];
-    const andKeys = ["inventoryProductId", "inventoryId", "productId", "userId"];
-
     const orConditions: object[] = [];
-    const orKeys: string[] = [];
 
     andKeys.forEach((key) => {
       if (filters[key]) {
@@ -50,7 +63,11 @@ const getAllInventoryProductsController = async (req: AuthenticatedRequest, res:
 
     if (search) {
       andConditions.push({
-        OR: [{ Products: { productName: { contains: search } } }, { Products: { productBarcode: { contains: search } } }, { Products: { productDesc: { contains: search } } }],
+        OR: [
+          { Products: { productName: { contains: search } } },
+          { Products: { productBarcode: { contains: search } } },
+          { Products: { productDesc: { contains: search } } },
+        ],
       });
     }
     // Check if the user is authorized to access all inventories, return only their inventories otherwise
@@ -81,16 +98,25 @@ const getAllInventoryProductsCountController = async (req: AuthenticatedRequest,
 
     const { search, ...filters } = queryParams;
 
+    const andKeys = ["inventoryProductId", "inventoryId", "productId", "userId"];
+    const orKeys: string[] = [];
+
+    const hasAnyAndKeys = andKeys.some((key) => key in filters);
+    const hasAnyOrKeys = orKeys.some((key) => key in filters);
+
+    if (Object.keys(filters).length > 0 && !hasAnyAndKeys && !hasAnyOrKeys) {
+      return res.status(400).json({ message: "Invalid filters provided" });
+    }
+
     const createCondition = (key: string, value: string) => {
       const values = value.split(",").map(Number);
-      return values.length === 1 ? { [key]: values[0] } : { [key]: { in: values } };
+      return values.length === 1
+        ? { [key]: key.includes("Id") ? values[0] : values[0].toString() }
+        : { [key]: { in: key.includes("Id") ? values : values.toString() } };
     };
 
     const andConditions: object[] = [];
-    const andKeys = ["inventoryProductId", "inventoryId", "productId", "userId"];
-
     const orConditions: object[] = [];
-    const orKeys: string[] = [];
 
     andKeys.forEach((key) => {
       if (filters[key]) {
@@ -106,7 +132,11 @@ const getAllInventoryProductsCountController = async (req: AuthenticatedRequest,
 
     if (search) {
       andConditions.push({
-        OR: [{ Products: { productName: { contains: search } } }, { Products: { productBarcode: { contains: search } } }, { Products: { productDesc: { contains: search } } }],
+        OR: [
+          { Products: { productName: { contains: search } } },
+          { Products: { productBarcode: { contains: search } } },
+          { Products: { productDesc: { contains: search } } },
+        ],
       });
     }
     // Check if the user is authorized to access all inventories, return only their inventories otherwise
@@ -132,14 +162,19 @@ const getInventoryProductsController = async (req: AuthenticatedRequest, res: Re
     if (isNaN(inventoryProductId)) {
       return res.status(400).json({ message: "Invalid inventory product ID" });
     }
-    const inventoryProduct: InventoryProduct | null = await inventoryProductsModel.getInventoryProduct(inventoryProductId);
+    const inventoryProduct: InventoryProduct | null = await inventoryProductsModel.getInventoryProduct(
+      inventoryProductId
+    );
 
     if (!inventoryProduct) {
       return res.status(404).json({ message: "Inventory product not found" });
     }
 
     // Check if the user is authorized to access the inventory product
-    if (!req.authUser || (req.authUser.UserRoles.roleId < 3000 && inventoryProduct.Users.userId !== req.authUser?.userId)) {
+    if (
+      !req.authUser ||
+      (req.authUser.UserRoles.roleId < 3000 && inventoryProduct.Users.userId !== req.authUser?.userId)
+    ) {
       return res.status(401).json({ message: "Unauthorized" });
     }
 
@@ -157,12 +192,18 @@ const createInventoryProductsController = async (req: AuthenticatedRequest, res:
     if (!inventory || inventory.archived) {
       return res.status(404).json({ message: "Inventory not found or archived" });
     }
-    if (!req.authUser || (req.authUser.UserRoles.roleId < 3000 && !inventory.Stores.Users.some((user) => user.userId === req.authUser?.userId))) {
+    if (
+      !req.authUser ||
+      (req.authUser.UserRoles.roleId < 3000 &&
+        !inventory.Stores.Users.some((user) => user.userId === req.authUser?.userId))
+    ) {
       return res.status(401).json({ message: "Unauthorized to create products in this inventory" });
     }
     // Set the user ID if not provided
     inventoryProduct.userId = req.authUser.userId;
-    const newInventoryProduct: InventoryProducts = await inventoryProductsModel.createInventoryProduct(inventoryProduct);
+    const newInventoryProduct: InventoryProducts = await inventoryProductsModel.createInventoryProduct(
+      inventoryProduct
+    );
     return res.status(201).json(newInventoryProduct);
   } catch (error) {
     next(error);
@@ -171,7 +212,9 @@ const createInventoryProductsController = async (req: AuthenticatedRequest, res:
 
 const updateInventoryProductsController = async (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
   try {
-    const existingInventoryProduct = await inventoryProductsModel.getInventoryProduct(parseInt(req.params.inventoryProductId));
+    const existingInventoryProduct = await inventoryProductsModel.getInventoryProduct(
+      parseInt(req.params.inventoryProductId)
+    );
     if (!existingInventoryProduct) {
       return res.status(404).json({ message: "Inventory product not found" });
     }
@@ -180,11 +223,16 @@ const updateInventoryProductsController = async (req: AuthenticatedRequest, res:
       return res.status(404).json({ message: "Inventory not found or archived" });
     }
 
-    if (!req.authUser || (req.authUser.UserRoles.roleId < 3000 && existingInventoryProduct.Users.userId !== req.authUser?.userId)) {
+    if (
+      !req.authUser ||
+      (req.authUser.UserRoles.roleId < 3000 && existingInventoryProduct.Users.userId !== req.authUser?.userId)
+    ) {
       return res.status(401).json({ message: "Unauthorized to update this inventory product" });
     }
     const inventoryProduct: InventoryProducts = req.body;
-    const updatedInventoryProduct: InventoryProducts = await inventoryProductsModel.updateInventoryProduct(inventoryProduct);
+    const updatedInventoryProduct: InventoryProducts = await inventoryProductsModel.updateInventoryProduct(
+      inventoryProduct
+    );
     return res.status(200).json(updatedInventoryProduct);
   } catch (error) {
     next(error);
@@ -205,10 +253,15 @@ const deleteInventoryProductsController = async (req: AuthenticatedRequest, res:
     if (!inventory || inventory.archived) {
       return res.status(404).json({ message: "Inventory not found or archived" });
     }
-    if (!req.authUser || (req.authUser.UserRoles.roleId < 3000 && existingInventoryProduct.Users.userId !== req.authUser?.userId)) {
+    if (
+      !req.authUser ||
+      (req.authUser.UserRoles.roleId < 3000 && existingInventoryProduct.Users.userId !== req.authUser?.userId)
+    ) {
       return res.status(401).json({ message: "Unauthorized to delete this inventory product" });
     }
-    const deletedInventoryProduct: InventoryProducts = await inventoryProductsModel.deleteInventoryProduct(inventoryProductId);
+    const deletedInventoryProduct: InventoryProducts = await inventoryProductsModel.deleteInventoryProduct(
+      inventoryProductId
+    );
     return res.status(200).json(deletedInventoryProduct);
   } catch (error) {
     next(error);

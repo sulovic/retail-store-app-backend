@@ -2,7 +2,11 @@ import productModel from "../models/productModel.js";
 import { Request, Response, NextFunction } from "express";
 import { Products } from "@prisma/client";
 
-const getAllProductsController = async (req: Request, res: Response, next: NextFunction): Promise<Response<any> | void> => {
+const getAllProductsController = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+): Promise<Response<any> | void> => {
   try {
     const queryParams: any = req?.query;
 
@@ -18,16 +22,25 @@ const getAllProductsController = async (req: Request, res: Response, next: NextF
           }
         : undefined;
 
+    const andKeys = ["productId", "productBarcode"];
+    const orKeys: string[] = [];
+
+    const hasAnyAndKeys = andKeys.some((key) => key in filters);
+    const hasAnyOrKeys = orKeys.some((key) => key in filters);
+
+    if (Object.keys(filters).length > 0 && !hasAnyAndKeys && !hasAnyOrKeys) {
+      return res.status(400).json({ message: "Invalid filters provided" });
+    }
+
     const createCondition = (key: string, value: string) => {
       const values = value.split(",").map(Number);
-      return values.length === 1 ? { [key]: values[0] } : { [key]: { in: values } };
+      return values.length === 1
+        ? { [key]: key.includes("Id") ? values[0] : values[0].toString() }
+        : { [key]: { in: key.includes("Id") ? values : values.toString() } };
     };
 
     const andConditions: object[] = [];
-    const andKeys = ["productId"];
-
     const orConditions: object[] = [];
-    const orKeys: string[] = [];
 
     andKeys.forEach((key) => {
       if (filters[key]) {
@@ -43,7 +56,11 @@ const getAllProductsController = async (req: Request, res: Response, next: NextF
 
     if (search) {
       andConditions.push({
-        OR: [{ productName: { contains: search } }, { productBarcode: { contains: search } }, { productDesc: { contains: search } }],
+        OR: [
+          { productName: { contains: search } },
+          { productBarcode: { contains: search } },
+          { productDesc: { contains: search } },
+        ],
       });
     }
 
@@ -64,22 +81,35 @@ const getAllProductsController = async (req: Request, res: Response, next: NextF
   }
 };
 
-const getAllProductsCountController = async (req: Request, res: Response, next: NextFunction): Promise<Response<any> | void> => {
+const getAllProductsCountController = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+): Promise<Response<any> | void> => {
   try {
     const queryParams: any = req?.query;
 
     const { search, ...filters } = queryParams;
 
+    const andKeys = ["productId", "productBarcode"];
+    const orKeys: string[] = [];
+
+    const hasAnyAndKeys = andKeys.some((key) => key in filters);
+    const hasAnyOrKeys = orKeys.some((key) => key in filters);
+
+    if (Object.keys(filters).length > 0 && !hasAnyAndKeys && !hasAnyOrKeys) {
+      return res.status(400).json({ message: "Invalid filters provided" });
+    }
+
     const createCondition = (key: string, value: string) => {
       const values = value.split(",").map(Number);
-      return values.length === 1 ? { [key]: values[0] } : { [key]: { in: values } };
+      return values.length === 1
+        ? { [key]: key.includes("Id") ? values[0] : values[0].toString() }
+        : { [key]: { in: key.includes("Id") ? values : values.toString() } };
     };
 
     const andConditions: object[] = [];
-    const andKeys = ["productId"];
-
     const orConditions: object[] = [];
-    const orKeys: string[] = [];
 
     andKeys.forEach((key) => {
       if (filters[key]) {
@@ -95,7 +125,11 @@ const getAllProductsCountController = async (req: Request, res: Response, next: 
 
     if (search) {
       andConditions.push({
-        OR: [{ productName: { contains: search } }, { productBarcode: { contains: search } }, { productDesc: { contains: search } }],
+        OR: [
+          { productName: { contains: search } },
+          { productBarcode: { contains: search } },
+          { productDesc: { contains: search } },
+        ],
       });
     }
 

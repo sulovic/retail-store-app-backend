@@ -8,7 +8,11 @@ interface AuthenticatedRequest extends Request {
   authUser?: TokenUserDataType;
 }
 
-const getAllInventoriesController = async (req: AuthenticatedRequest, res: Response, next: NextFunction): Promise<Response<any> | void> => {
+const getAllInventoriesController = async (
+  req: AuthenticatedRequest,
+  res: Response,
+  next: NextFunction
+): Promise<Response<any> | void> => {
   try {
     const queryParams: any = req?.query;
 
@@ -24,16 +28,25 @@ const getAllInventoriesController = async (req: AuthenticatedRequest, res: Respo
           }
         : undefined;
 
+    const andKeys = ["inventoryId", "storeId", "creatorId"];
+    const orKeys: string[] = [];
+
+    const hasAnyAndKeys = andKeys.some((key) => key in filters);
+    const hasAnyOrKeys = orKeys.some((key) => key in filters);
+
+    if (Object.keys(filters).length > 0 && !hasAnyAndKeys && !hasAnyOrKeys) {
+      return res.status(400).json({ message: "Invalid filters provided" });
+    }
+
     const createCondition = (key: string, value: string) => {
       const values = value.split(",").map(Number);
-      return values.length === 1 ? { [key]: values[0] } : { [key]: { in: values } };
+      return values.length === 1
+        ? { [key]: key.includes("Id") ? values[0] : values[0].toString() }
+        : { [key]: { in: key.includes("Id") ? values : values.toString() } };
     };
 
     const andConditions: object[] = [];
-    const andKeys = ["inventoryId", "storeId", "creatorId"];
-
     const orConditions: object[] = [];
-    const orKeys: string[] = [];
 
     andKeys.forEach((key) => {
       if (filters[key]) {
@@ -69,22 +82,35 @@ const getAllInventoriesController = async (req: AuthenticatedRequest, res: Respo
   }
 };
 
-const getAllInventoriesCountController = async (req: AuthenticatedRequest, res: Response, next: NextFunction): Promise<Response<any> | void> => {
+const getAllInventoriesCountController = async (
+  req: AuthenticatedRequest,
+  res: Response,
+  next: NextFunction
+): Promise<Response<any> | void> => {
   try {
     const queryParams: any = req?.query;
 
     const { ...filters } = queryParams;
 
+    const andKeys = ["inventoryId", "storeId", "creatorId"];
+    const orKeys: string[] = [];
+
+    const hasAnyAndKeys = andKeys.some((key) => key in filters);
+    const hasAnyOrKeys = orKeys.some((key) => key in filters);
+
+    if (Object.keys(filters).length > 0 && !hasAnyAndKeys && !hasAnyOrKeys) {
+      return res.status(400).json({ message: "Invalid filters provided" });
+    }
+
     const createCondition = (key: string, value: string) => {
       const values = value.split(",").map(Number);
-      return values.length === 1 ? { [key]: values[0] } : { [key]: { in: values } };
+      return values.length === 1
+        ? { [key]: key.includes("Id") ? values[0] : values[0].toString() }
+        : { [key]: { in: key.includes("Id") ? values : values.toString() } };
     };
 
     const andConditions: object[] = [];
-    const andKeys = ["inventoryId", "storeId", "creatorId"];
-
     const orConditions: object[] = [];
-    const orKeys: string[] = [];
 
     andKeys.forEach((key) => {
       if (filters[key]) {
@@ -129,7 +155,11 @@ const getInventoryController = async (req: AuthenticatedRequest, res: Response, 
     }
 
     // Check if the user is authorized to access the inventory
-    if (!req.authUser || (req.authUser.UserRoles.roleId < 3000 && !inventory.Stores.Users.some((user) => user.userId === req.authUser?.userId))) {
+    if (
+      !req.authUser ||
+      (req.authUser.UserRoles.roleId < 3000 &&
+        !inventory.Stores.Users.some((user) => user.userId === req.authUser?.userId))
+    ) {
       return res.status(401).json({ message: "Unauthorized" });
     }
     return res.status(200).json(inventory);

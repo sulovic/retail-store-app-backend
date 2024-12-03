@@ -2,7 +2,11 @@ import userModel from "../models/userModel.js";
 import { Request, Response, NextFunction } from "express";
 import { UserPublicDataType } from "../types/types.js";
 
-const getAllUsersController = async (req: Request, res: Response, next: NextFunction): Promise<Response<any> | void> => {
+const getAllUsersController = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+): Promise<Response<any> | void> => {
   try {
     const queryParams: any = req?.query;
 
@@ -18,16 +22,25 @@ const getAllUsersController = async (req: Request, res: Response, next: NextFunc
           }
         : undefined;
 
+    const andKeys = ["userId", "roleId"];
+    const orKeys: string[] = [];
+
+    const hasAnyAndKeys = andKeys.some((key) => key in filters);
+    const hasAnyOrKeys = orKeys.some((key) => key in filters);
+
+    if (Object.keys(filters).length > 0 && !hasAnyAndKeys && !hasAnyOrKeys) {
+      return res.status(400).json({ message: "Invalid filters provided" });
+    }
+
     const createCondition = (key: string, value: string) => {
       const values = value.split(",").map(Number);
-      return values.length === 1 ? { [key]: values[0] } : { [key]: { in: values } };
+      return values.length === 1
+        ? { [key]: key.includes("Id") ? values[0] : values[0].toString() }
+        : { [key]: { in: key.includes("Id") ? values : values.toString() } };
     };
 
     const andConditions: object[] = [];
-    const andKeys = ["userId", "roleId"];
-
     const orConditions: object[] = [];
-    const orKeys: string[] = [];
 
     andKeys.forEach((key) => {
       if (filters[key]) {
@@ -64,22 +77,35 @@ const getAllUsersController = async (req: Request, res: Response, next: NextFunc
   }
 };
 
-const getAllUsersCountController = async (req: Request, res: Response, next: NextFunction): Promise<Response<any> | void> => {
+const getAllUsersCountController = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+): Promise<Response<any> | void> => {
   try {
     const queryParams: any = req?.query;
 
     const { search, ...filters } = queryParams;
 
+    const andKeys = ["userId", "roleId"];
+    const orKeys: string[] = [];
+
+    const hasAnyAndKeys = andKeys.some((key) => key in filters);
+    const hasAnyOrKeys = orKeys.some((key) => key in filters);
+
+    if (Object.keys(filters).length > 0 && !hasAnyAndKeys && !hasAnyOrKeys) {
+      return res.status(400).json({ message: "Invalid filters provided" });
+    }
+
     const createCondition = (key: string, value: string) => {
       const values = value.split(",").map(Number);
-      return values.length === 1 ? { [key]: values[0] } : { [key]: { in: values } };
+      return values.length === 1
+        ? { [key]: key.includes("Id") ? values[0] : values[0].toString() }
+        : { [key]: { in: key.includes("Id") ? values : values.toString() } };
     };
 
     const andConditions: object[] = [];
-    const andKeys = ["userId", "roleId"];
-
     const orConditions: object[] = [];
-    const orKeys: string[] = [];
 
     andKeys.forEach((key) => {
       if (filters[key]) {
