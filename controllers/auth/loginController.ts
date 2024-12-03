@@ -35,6 +35,7 @@ const loginController = async (req: Request, res: Response, next: NextFunction):
       }
 
       const decodedCredential = await verifyGoogleToken(credential);
+      console.log(decodedCredential);
       if (!decodedCredential?.email) {
         return res.status(401).json({ message: "Invalid Google credentials" });
       }
