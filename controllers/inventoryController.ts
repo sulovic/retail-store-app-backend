@@ -28,7 +28,7 @@ const getAllInventoriesController = async (
           }
         : undefined;
 
-    const andKeys = ["inventoryId", "storeId", "creatorId"];
+    const andKeys = ["inventoryId", "storeId", "creatorId", "archived"];
     const orKeys: string[] = [];
 
     const hasAnyAndKeys = andKeys.some((key) => key in filters);
@@ -92,7 +92,7 @@ const getAllInventoriesCountController = async (
 
     const { sortBy, sortOrder, limit, page, search, ...filters } = queryParams;
 
-    const andKeys = ["inventoryId", "storeId", "creatorId"];
+    const andKeys = ["inventoryId", "storeId", "creatorId", "archived"];
     const orKeys: string[] = [];
 
     const hasAnyAndKeys = andKeys.some((key) => key in filters);
