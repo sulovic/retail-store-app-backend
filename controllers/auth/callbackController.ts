@@ -27,8 +27,6 @@ const callbackController = async (req: Request, res: Response) => {
     if (response.ok) {
       // Successfully obtained the access token
       const accessToken = data.access_token;
-     
-
 
       res.status(200).json({ access_token: accessToken });
     } else {

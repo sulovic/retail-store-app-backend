@@ -34,6 +34,9 @@ const getAllProductsController = async (
 
     const createCondition = (key: string, value: string) => {
       const values = value.split(",").map((item) => {
+        if (key === "productBarcode") {
+          return item.toString();
+        }
         return isNaN(Number(item)) ? item.toString() : Number(item);
       });
       return values.length === 1 ? { [key]: values[0] } : { [key]: { in: values } };
@@ -103,6 +106,9 @@ const getAllProductsCountController = async (
 
     const createCondition = (key: string, value: string) => {
       const values = value.split(",").map((item) => {
+        if (key === "productBarcode") {
+          return item.toString();
+        }
         return isNaN(Number(item)) ? item.toString() : Number(item);
       });
       return values.length === 1 ? { [key]: values[0] } : { [key]: { in: values } };
