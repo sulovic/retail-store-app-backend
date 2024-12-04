@@ -1,4 +1,4 @@
-import { Request, Response, NextFunction } from "express";
+import { Request, Response } from "express";
 
 const callbackController = async (req: Request, res: Response) => {
   const { code } = req.query;
@@ -8,18 +8,20 @@ const callbackController = async (req: Request, res: Response) => {
   }
 
   try {
+    // Create the form data with URLSearchParams
+    const formData = new URLSearchParams();
+    formData.append("code", code as string);
+    formData.append("client_id", process.env.GOOGLE_CLIENT_ID || "");
+    formData.append("client_secret", process.env.GOOGLE_CLIENT_SECRET || "");
+    formData.append("redirect_uri", process.env.GOOGLE_REDIRECT_URI || "");
+    formData.append("grant_type", "authorization_code");
+
     const response = await fetch("https://oauth2.googleapis.com/token", {
       method: "POST",
       headers: {
         "Content-Type": "application/x-www-form-urlencoded",
       },
-      body: JSON.stringify({
-        code: code,
-        client_id: process.env.GOOGLE_CLIENT_ID,
-        client_secret: process.env.GOOGLE_CLIENT_SECRET,
-        redirect_uri: process.env.GOOGLE_REDIRECT_URI,
-        grant_type: "authorization_code",
-      }),
+      body: formData.toString(), // Convert formData to a URL-encoded string
     });
 
     const data = await response.json();
