@@ -27,6 +27,12 @@ const callbackController = async (req: Request, res: Response) => {
       body: formData.toString(), // Convert formData to a URL-encoded string
     });
 
+    console.log("Google token response:", response);
+if (!response.ok) {
+  console.error("Error details:", response);
+}
+
+
     const data = await response.json();
 
     if (response.ok) {
