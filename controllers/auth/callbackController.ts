@@ -1,13 +1,13 @@
 import { Request, Response } from "express";
 
 const callbackController = async (req: Request, res: Response) => {
-  const { code } = req.body;
+  const { code, code_verifier } = req.body;
 
   if (!code) {
     return res.status(400).json({ error: "No authorization code provided" });
   }
 
-  console.log("Received authorization code:", code);
+  console.log("Received authorization code:", code, code_verifier);
 
   try {
     // Create the form data with URLSearchParams
@@ -16,9 +16,8 @@ const callbackController = async (req: Request, res: Response) => {
     formData.append("client_id", process.env.GOOGLE_CLIENT_ID || "");
     formData.append("client_secret", process.env.GOOGLE_CLIENT_SECRET || "");
     formData.append("redirect_uri", process.env.GOOGLE_REDIRECT_URI || "");
-    formData.append("grant_type", "authorization_code");
-
-    console.log("Form data:", formData.toString());
+    formData.append("grant_type", "authorization_code");    
+    formData.append("code_verifier", code_verifier); // Include code_verifier here
 
 
     const response = await fetch("https://oauth2.googleapis.com/token", {
