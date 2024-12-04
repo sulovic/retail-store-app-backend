@@ -7,6 +7,8 @@ const callbackController = async (req: Request, res: Response) => {
     return res.status(400).json({ error: "No authorization code provided" });
   }
 
+  console.log("Received authorization code:", code);
+
   try {
     // Create the form data with URLSearchParams
     const formData = new URLSearchParams();
@@ -15,6 +17,7 @@ const callbackController = async (req: Request, res: Response) => {
     formData.append("client_secret", process.env.GOOGLE_CLIENT_SECRET || "");
     formData.append("redirect_uri", process.env.GOOGLE_REDIRECT_URI || "");
     formData.append("grant_type", "authorization_code");
+
 
     const response = await fetch("https://oauth2.googleapis.com/token", {
       method: "POST",
