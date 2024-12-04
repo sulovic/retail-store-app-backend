@@ -6,9 +6,6 @@ const callbackController = async (req: Request, res: Response) => {
   if (!code) {
     return res.status(400).json({ error: "No authorization code provided" });
   }
-
-  console.log("Received authorization code:", code, code_verifier);
-
   try {
     // Create the form data with URLSearchParams
     const formData = new URLSearchParams();
@@ -16,9 +13,8 @@ const callbackController = async (req: Request, res: Response) => {
     formData.append("client_id", process.env.GOOGLE_CLIENT_ID || "");
     formData.append("client_secret", process.env.GOOGLE_CLIENT_SECRET || "");
     formData.append("redirect_uri", process.env.GOOGLE_REDIRECT_URI || "");
-    formData.append("grant_type", "authorization_code");    
+    formData.append("grant_type", "authorization_code");
     formData.append("code_verifier", code_verifier); // Include code_verifier here
-
 
     const response = await fetch("https://oauth2.googleapis.com/token", {
       method: "POST",
@@ -28,11 +24,9 @@ const callbackController = async (req: Request, res: Response) => {
       body: formData.toString(), // Convert formData to a URL-encoded string
     });
 
-    console.log("Google token response:", response);
-if (!response.ok) {
-  console.error("Error details:", response);
-}
-
+    if (!response.ok) {
+      console.error("Error details:", response);
+    }
 
     const data = await response.json();
 
@@ -40,14 +34,12 @@ if (!response.ok) {
       // Successfully obtained the access token
       const accessToken = data.access_token;
 
-      console.log("Access token:", accessToken);
 
       res.status(200).json({ access_token: accessToken });
     } else {
       res.status(400).json({ error: data.error_description || "Unknown error" });
     }
   } catch (error) {
-    console.error("Error exchanging code for token:", error);
     res.status(500).json({ error: "Internal server error" });
   }
 };
