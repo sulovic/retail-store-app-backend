@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
 
 const callbackController = async (req: Request, res: Response) => {
-  const { code } = req.query;
+  const { code } = req.body;
 
   if (!code) {
     return res.status(400).json({ error: "No authorization code provided" });
@@ -29,6 +29,8 @@ const callbackController = async (req: Request, res: Response) => {
     if (response.ok) {
       // Successfully obtained the access token
       const accessToken = data.access_token;
+
+      console.log("Access token:", accessToken);
 
       res.status(200).json({ access_token: accessToken });
     } else {
