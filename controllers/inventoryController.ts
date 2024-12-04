@@ -63,9 +63,11 @@ const getAllInventoriesController = async (
       }
     });
 
-    // Check if the user is authorized to access all inventories, return only their active inventories otherwise
+    // Check if the user is authorized to access all inventories, return only their conented Store inventories otherwise
     if (!req.authUser || req.authUser.UserRoles.roleId < 3000) {
-      andConditions.push({ AND: [{ Creator: { some: { userId: req.authUser?.userId } } }, { archived: false }] });
+      andConditions.push({
+        AND: [{ Stores: { storeId: { in: req.authUser?.Stores.map((store) => store.storeId) } } }, { archived: false }],
+      });
     }
 
     const whereClause = {
@@ -94,7 +96,6 @@ const getAllInventoriesCountController = async (
     const queryParams: any = req?.query;
 
     const { sortBy, sortOrder, limit, page, search, ...filters } = queryParams;
-
 
     const andKeys = ["inventoryId", "storeId", "creatorId", "archived"];
     const orKeys: string[] = [];
@@ -131,9 +132,11 @@ const getAllInventoriesCountController = async (
       }
     });
 
-    // Check if the user is authorized to access all inventories, return only their active inventories otherwise
+    // Check if the user is authorized to access all inventories, return only their conented Store inventories otherwise
     if (!req.authUser || req.authUser.UserRoles.roleId < 3000) {
-      andConditions.push({ AND: [{ Creator: { some: { userId: req.authUser?.userId } } }, { archived: false }] });
+      andConditions.push({
+        AND: [{ Stores: { storeId: { in: req.authUser?.Stores.map((store) => store.storeId) } } }, { archived: false }],
+      });
     }
 
     const whereClause = {

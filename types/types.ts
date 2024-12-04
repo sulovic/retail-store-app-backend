@@ -42,6 +42,11 @@ export type TokenUserDataType = {
     roleId: number;
     roleName: string;
   };
+  Stores: {
+    storeId: number;
+    storeName: string;
+    storeAddress: string;
+  }[];
 };
 
 export type Store = {
