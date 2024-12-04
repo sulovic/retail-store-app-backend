@@ -18,6 +18,8 @@ const callbackController = async (req: Request, res: Response) => {
     formData.append("redirect_uri", process.env.GOOGLE_REDIRECT_URI || "");
     formData.append("grant_type", "authorization_code");
 
+    console.log("Form data:", formData.toString());
+
 
     const response = await fetch("https://oauth2.googleapis.com/token", {
       method: "POST",
