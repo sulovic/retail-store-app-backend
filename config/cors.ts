@@ -12,7 +12,6 @@ type CorsCallback = (err: Error | null, allow?: boolean) => void;
 const corsConfig = {
     origin: (requestOrigin: string | undefined, callback: CorsCallback) => {
         const isWhitelistedOrigin : boolean = (requestOrigin && whitelist.includes(requestOrigin)) || !requestOrigin ;
-        console.log(requestOrigin);
         if (isWhitelistedOrigin) {
             callback(null, true);
         } else {

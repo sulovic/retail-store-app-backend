@@ -12,7 +12,6 @@ import verifyAccessToken from "./middleware/verifyAccessToken.js";
 import loginRoute from "./routes/auth/loginRoute.js";
 import logoutRoute from "./routes/auth/logoutRoute.js";
 import refreshRoute from "./routes/auth/refreshRoute.js";
-import callbackRoute from "./routes/auth/callbackRoute.js";
 
 // Import data routes
 
@@ -46,7 +45,6 @@ app.use(express.static(path.join(__dirname, "public")));
 app.use("/login", loginRoute);
 app.use("/logout", logoutRoute);
 app.use("/refresh", refreshRoute);
-app.use("/auth/callback", callbackRoute);
 
 // Data Routes
 app.use("/api/products", verifyAccessToken("products"), productRoutes);
