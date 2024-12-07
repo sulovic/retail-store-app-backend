@@ -5,9 +5,9 @@ const router = Router();
 
 router.get("/", procurementController.getAllProcurementsController);
 router.get("/count", procurementController.getAllProcurementsCountController);
-router.get("/:inventoryId", procurementController.getProcurementController);
+router.get("/:procurementId", procurementController.getProcurementController);
 router.post("/", procurementController.createProcurementController);
-router.put("/:inventoryId", procurementController.updateProcurementController);
-router.delete("/:inventoryId", procurementController.deleteProcurementController);
+router.put("/:procurementId", procurementController.updateProcurementController);
+router.delete("/:procurementId", procurementController.deleteProcurementController);
 
 export default router;
