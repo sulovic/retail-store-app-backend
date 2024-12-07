@@ -89,3 +89,23 @@ export type InventoryProduct = {
     productName: string;
   };
 };
+
+export type Procurement = {
+  procurementId: number;
+  Products: {
+    productId: number;
+    productName: string;
+    productBarcode: string;
+  }
+  productQuantity: number;
+  Stores: {
+    storeId: number;
+    storeName: string;}
+    Users: {
+    userId: number;
+    firstName: string;
+    lastName: string;
+  };
+  completed: boolean | null;
+  createdAt:  Date;
+};

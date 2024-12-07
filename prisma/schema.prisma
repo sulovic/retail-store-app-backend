@@ -22,6 +22,7 @@ model Users {
     InventoryProducts InventoryProducts[]
     Inventories       Inventories[]
     Stores            Stores[]
+    Procurements      Procurements[]
 
     @@index([userId])
     @@index([email])
@@ -44,6 +45,7 @@ model Products {
     createdAt         DateTime            @default(now())
     deletedAt         DateTime?
     InventoryProducts InventoryProducts[]
+    Procurements      Procurements[]
 
     @@index([productId])
     @@index([productName])
@@ -80,15 +82,29 @@ model InventoryProducts {
 }
 
 model Stores {
-    storeId      Int           @id @default(autoincrement())
-    storeName    String        @db.VarChar(64)
-    storeAddress String        @db.VarChar(128)
-    deleted      Boolean       @default(false)
+    storeId      Int            @id @default(autoincrement())
+    storeName    String         @db.VarChar(64)
+    storeAddress String         @db.VarChar(128)
+    deleted      Boolean        @default(false)
     deletedAt    DateTime?
     Inventories  Inventories[]
     Users        Users[]
+    Procurements Procurements[]
 
     @@index([storeId])
     @@index([storeName])
     @@index([storeAddress])
+}
+
+model Procurements {
+    procurementId   Int      @id @default(autoincrement())
+    storeId         Int
+    Stores          Stores   @relation(fields: [storeId], references: [storeId])
+    productId       Int
+    Products        Products @relation(fields: [productId], references: [productId])
+    productQuantity Float
+    userId          Int
+    Users           Users    @relation(fields: [userId], references: [userId])
+    completed       Boolean?
+    createdAt       DateTime @default(now())
 }
