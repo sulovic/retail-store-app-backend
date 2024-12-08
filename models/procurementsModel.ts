@@ -115,6 +115,15 @@ const deleteProcurement = async (procurementId: number): Promise<Procurements> =
   });
 };
 
+const resetProcurements = async (storeId: number): Promise<{ count: number }> => {
+  return await prisma.procurements.deleteMany({
+    where: {
+      storeId,
+    },
+  });
+};
+
+
 export default {
   getAllProcurements,
   getAllProcurementsCount,
@@ -122,4 +131,5 @@ export default {
   createProcurement,
   updateProcurement,
   deleteProcurement,
+  resetProcurements
 };

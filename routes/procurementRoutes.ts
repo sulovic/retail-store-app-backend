@@ -9,5 +9,6 @@ router.get("/:procurementId", procurementController.getProcurementController);
 router.post("/", procurementController.createProcurementController);
 router.put("/:procurementId", procurementController.updateProcurementController);
 router.delete("/:procurementId", procurementController.deleteProcurementController);
+router.delete("/reset/:storeId", procurementController.resetProcurementsController);
 
 export default router;

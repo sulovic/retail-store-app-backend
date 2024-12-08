@@ -259,6 +259,22 @@ const deleteProcurementController = async (req: AuthenticatedRequest, res: Respo
   }
 };
 
+const resetProcurementsController = async (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
+  
+  if (!req.authUser || req.authUser.UserRoles.roleId < 3000) {
+    return res.status(401).json({ message: "Unauthorized to reset procurements" });
+  }
+
+
+  try {
+    const storeId: number = parseInt(req.params.storeId);
+    const resetProcurements: { count: number } = await procurementsModel.resetProcurements(storeId);
+    return res.status(200).json("Deleted procurements count: " + resetProcurements.count);
+  } catch (error) {
+    next(error);
+  }
+};
+
 export default {
   getAllProcurementsController,
   getAllProcurementsCountController,
@@ -266,5 +282,5 @@ export default {
   createProcurementController,
   updateProcurementController,
   deleteProcurementController,
- 
+  resetProcurementsController
 };
