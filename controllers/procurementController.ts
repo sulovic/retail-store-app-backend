@@ -179,11 +179,13 @@ const getProcurementController = async (req: AuthenticatedRequest, res: Response
 
     // Check if the user is authorized to access the procurement
     if (
-      !req.authUser ||
-      (req.authUser.UserRoles.roleId < 3000 &&
-        req.authUser.Stores?.some((store) => store.storeId === procurement.Stores?.storeId))
+      !(
+        req.authUser &&
+        (req.authUser.UserRoles?.roleId > 3000 ||
+          req.authUser.Stores?.some((store) => store.storeId === procurement?.Stores?.storeId))
+      )
     ) {
-      return res.status(401).json({ message: "Unauthorized" });
+      return res.status(401).json({ message: "Unauthorized to access this procurement" });
     }
 
     return res.status(200).json(procurement);
@@ -195,11 +197,13 @@ const getProcurementController = async (req: AuthenticatedRequest, res: Response
 const createProcurementController = async (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
   try {
     const procurement: Omit<Procurements, "procurementId"> = req.body;
-
+    // Check if the user is authorized
     if (
-      !req.authUser ||
-      (req.authUser.UserRoles.roleId < 3000 &&
-        req.authUser.Stores?.some((store) => store.storeId === procurement.storeId))
+      !(
+        req.authUser &&
+        (req.authUser.UserRoles?.roleId > 3000 ||
+          req.authUser.Stores?.some((store) => store.storeId === procurement?.storeId))
+      )
     ) {
       return res.status(401).json({ message: "Unauthorized to create procurement for this Store" });
     }
@@ -219,17 +223,18 @@ const updateProcurementController = async (req: AuthenticatedRequest, res: Respo
       return res.status(404).json({ message: "Procurement not found" });
     }
 
+    // Check if the user is authorized
     if (
-      !req.authUser ||
-      (req.authUser.UserRoles.roleId < 3000 &&
-        req.authUser.Stores?.some((store) => store.storeId === existingProcurement.Stores.storeId))
+      !(
+        req.authUser &&
+        (req.authUser.UserRoles?.roleId > 3000 ||
+          req.authUser.Stores?.some((store) => store.storeId === existingProcurement?.Stores?.storeId))
+      )
     ) {
       return res.status(401).json({ message: "Unauthorized to update this procurement" });
     }
     const procurement: Procurements = req.body;
-    const updatedProcurement: Procurements = await procurementsModel.updateProcurement(
-      procurement
-    );
+    const updatedProcurement: Procurements = await procurementsModel.updateProcurement(procurement);
     return res.status(200).json(updatedProcurement);
   } catch (error) {
     next(error);
@@ -243,10 +248,13 @@ const deleteProcurementController = async (req: AuthenticatedRequest, res: Respo
       return res.status(404).json({ message: "Procurement not found" });
     }
 
+    // Check if the user is authorized
     if (
-      !req.authUser ||
-      (req.authUser.UserRoles.roleId < 3000 &&
-        req.authUser.Stores?.some((store) => store.storeId === existingProcurement.Stores.storeId))
+      !(
+        req.authUser &&
+        (req.authUser.UserRoles?.roleId > 3000 ||
+          req.authUser.Stores?.some((store) => store.storeId === existingProcurement?.Stores?.storeId))
+      )
     ) {
       return res.status(401).json({ message: "Unauthorized to delete this procurement" });
     }
@@ -260,11 +268,9 @@ const deleteProcurementController = async (req: AuthenticatedRequest, res: Respo
 };
 
 const resetProcurementsController = async (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
-  
   if (!req.authUser || req.authUser.UserRoles.roleId < 3000) {
     return res.status(401).json({ message: "Unauthorized to reset procurements" });
   }
-
 
   try {
     const storeId: number = parseInt(req.params.storeId);
@@ -282,5 +288,5 @@ export default {
   createProcurementController,
   updateProcurementController,
   deleteProcurementController,
-  resetProcurementsController
+  resetProcurementsController,
 };
