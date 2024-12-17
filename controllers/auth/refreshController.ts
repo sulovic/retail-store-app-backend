@@ -1,10 +1,8 @@
 import { Request, Response, NextFunction } from "express";
 import { UserPublicDataType, AuthUserDataType } from "types/types.js";
 import jwt from "jsonwebtoken";
-
 import { getAuthUser } from "../../models/userAuthModels.js";
 import { generateAccessToken } from "../../utils/generateTokens.js";
-
 
 const refreshController = async (req: Request, res: Response, next: NextFunction): Promise<Response<any> | void> => {
   try {
@@ -16,7 +14,10 @@ const refreshController = async (req: Request, res: Response, next: NextFunction
 
     // Verify the token signature
 
-    const decodedRefreshToken = jwt.verify(refreshToken, process.env.REFRESH_TOKEN_SECRET as string) as UserPublicDataType;
+    const decodedRefreshToken = jwt.verify(
+      refreshToken,
+      process.env.REFRESH_TOKEN_SECRET as string
+    ) as UserPublicDataType;
 
     // Check if the provided refresh token matches the one stored in the database
 

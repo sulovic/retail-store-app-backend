@@ -1,6 +1,7 @@
 import userModel from "../models/userModel.js";
 import { Request, Response, NextFunction } from "express";
 import { UserPublicDataType } from "../types/types.js";
+import { get } from "http";
 
 const getAllUsersController = async (
   req: Request,
@@ -186,6 +187,7 @@ const deleteUserController = async (req: Request, res: Response, next: NextFunct
 
 export default {
   getAllUsersController,
+  getAllUsersCountController,
   getUserController,
   createUserController,
   updateUserController,
