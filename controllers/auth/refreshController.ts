@@ -4,7 +4,7 @@ import jwt from "jsonwebtoken";
 import { getAuthUser } from "../../models/userAuthModels.js";
 import { generateAccessToken } from "../../utils/generateTokens.js";
 
-const refreshController = async (req: Request, res: Response, next: NextFunction): Promise<Response<any> | void> => {
+const refreshController = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const refreshToken = req?.cookies?.refreshToken;
 
@@ -33,9 +33,9 @@ const refreshController = async (req: Request, res: Response, next: NextFunction
 
     // Refresh token is valid, issue new access token
 
-    const { password: removedPassword, refreshToken: removedRefreshToken, createdAt, ...userData } = authUser;
+    const { password: removedPassword, refreshToken: removedRefreshToken, createdAt, ...userPublicData } = authUser; // eslint-disable-line @typescript-eslint/no-unused-vars
 
-    const accessToken = await generateAccessToken(userData);
+    const accessToken = await generateAccessToken(userPublicData);
 
     return res.status(200).json({
       accessToken,

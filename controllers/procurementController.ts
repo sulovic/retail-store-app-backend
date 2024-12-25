@@ -1,20 +1,16 @@
 import procurementsModel from "../models/procurementsModel.js";
 import { Request, Response, NextFunction } from "express";
 import { Procurements } from "@prisma/client";
-import { Procurement } from "../types/types.js";
+import { Procurement, QueryParams } from "../types/types.js";
 import { TokenUserDataType } from "../types/types.js";
 
 interface AuthenticatedRequest extends Request {
   authUser?: TokenUserDataType;
 }
 
-const getAllProcurementsController = async (
-  req: AuthenticatedRequest,
-  res: Response,
-  next: NextFunction
-): Promise<Response<any> | void> => {
+const getAllProcurementsController = async (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
   try {
-    const queryParams: any = req?.query;
+    const queryParams: QueryParams = req?.query as QueryParams;
 
     const { sortBy, sortOrder, limit, page, search, ...filters } = queryParams;
 
@@ -93,19 +89,9 @@ const getAllProcurementsController = async (
 
 const getAllProcurementsCountController = async (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
   try {
-    const queryParams: any = req?.query;
+    const queryParams: QueryParams = req?.query as QueryParams;
 
-    const { sortBy, sortOrder, limit, page, search, ...filters } = queryParams;
-
-    const take: number | undefined = limit ? parseInt(limit) : undefined;
-    const skip: number | undefined = page && limit ? (parseInt(page) - 1) * parseInt(limit) : undefined;
-
-    const orderBy: object | undefined =
-      sortBy && sortOrder
-        ? {
-            [sortBy]: sortOrder,
-          }
-        : undefined;
+    const { sortBy, sortOrder, limit, page, search, ...filters } = queryParams; // eslint-disable-line @typescript-eslint/no-unused-vars
 
     const andKeys = ["procurementId", "productId", "storeId", "userId"];
     const orKeys: string[] = [];

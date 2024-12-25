@@ -60,8 +60,8 @@ const deleteProduct = async (productId: number): Promise<Products> => {
 
 const bulkUploadProducts = async (products: Omit<Products, "productId">[]): Promise<Products[]> => {
   const chunkSize = 100;
-  const chunkArray = (array: any[], size: number) => {
-    const chunks: any[] = [];
+  const chunkArray = (array: Omit<Products, "productId">[], size: number) => {
+    const chunks = [];
     for (let i = 0; i < array.length; i += size) {
       chunks.push(array.slice(i, i + size));
     }

@@ -109,3 +109,12 @@ export type Procurement = {
   completed: boolean | null;
   createdAt:  Date;
 };
+
+export type  QueryParams = {
+  sortBy?: string; 
+  sortOrder?: 'asc' | 'desc'; 
+  limit?: string; 
+  page?: string; 
+  search?: string;
+  [key: string]: string | undefined;
+}

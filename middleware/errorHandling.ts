@@ -1,10 +1,21 @@
-import { Request, Response, NextFunction, ErrorRequestHandler } from "express";
+import { Request, Response, ErrorRequestHandler, NextFunction } from "express";
 import { Prisma } from "@prisma/client";
 
-const errorHandler: ErrorRequestHandler = (err: any, req: Request, res: Response, next: NextFunction) : void => {
+const errorHandler: ErrorRequestHandler = (
+  err:
+    | Prisma.PrismaClientKnownRequestError
+    | Prisma.PrismaClientInitializationError
+    | Prisma.PrismaClientUnknownRequestError
+    | Prisma.PrismaClientValidationError
+    | Prisma.PrismaClientRustPanicError
+    | Error,
+  req: Request,
+  res: Response,
+  next: NextFunction // eslint-disable-line
+): void => {
   // Implement Error Logger
-  console.error("Error:", err);
 
+console.log("here", err.message)
   if (err instanceof Prisma.PrismaClientKnownRequestError) {
     if (err.code === "P2002") {
       res.status(409).json({ message: "Duplicate entry detected." });
@@ -48,14 +59,14 @@ const errorHandler: ErrorRequestHandler = (err: any, req: Request, res: Response
     return;
   }
   //Handle other specific errors
-      // errorLogger(err, req);
-    // if (err.name === "InvalidGoogleToken") {
-    //   return res.status(401).json({ error: "Unauthorized - Invalid Google Token" });
-    // } else {
-    //   res.status(500).json({ error: "Internal Server Error" });
-    // }
+  // errorLogger(err, req);
+  // if (err.name === "InvalidGoogleToken") {
+  //   return res.status(401).json({ error: "Unauthorized - Invalid Google Token" });
+  // } else {
+  //   res.status(500).json({ error: "Internal Server Error" });
+  // }
 
-  res.status(err.statusCode || 500).json({
+  res.status(500).json({
     message: err.message || "Internal Server Error",
   });
 };

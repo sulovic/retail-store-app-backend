@@ -1,13 +1,18 @@
 import { Request, Response, NextFunction } from "express";
 import bcrypt from "bcryptjs";
-import { AuthUserDataType, TokenUserDataType } from "../../types/types.js";
+import { AuthUserDataType } from "../../types/types.js";
 import { getAuthUser } from "../../models/userAuthModels.js";
 import verifyGoogleToken from "../../utils/verifyGoogleToken.js";
 import { generateAccessToken, generateRefreshToken } from "../../utils/generateTokens.js";
 
-const loginController = async (req: Request, res: Response, next: NextFunction): Promise<Response | void> => {
+const loginController = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const { type, email, password, credential }: { type: "password" | "google"; email: string; password?: string; credential?: string } = req.body;
+    const {
+      type,
+      email,
+      password,
+      credential,
+    }: { type: "password" | "google"; email: string; password?: string; credential?: string } = req.body;
 
     if (!type) {
       return res.status(400).json({ message: "Missing authentication type" });
@@ -55,9 +60,10 @@ const loginController = async (req: Request, res: Response, next: NextFunction):
 };
 
 const sendAuthResponse = async (res: Response, user: AuthUserDataType) => {
-  const { password, refreshToken, createdAt, ...userData } = user;
-  const accessToken = await generateAccessToken(userData);
-  const refreshTokenValue = await generateRefreshToken(userData);
+  const { password, refreshToken, createdAt, ...userPublicData } = user; // eslint-disable-line @typescript-eslint/no-unused-vars
+
+  const accessToken = await generateAccessToken(userPublicData);
+  const refreshTokenValue = await generateRefreshToken(userPublicData);
 
   return res
     .cookie("refreshToken", refreshTokenValue, {

@@ -1,7 +1,7 @@
 import inventoryModel from "../models/inventoriesModel.js";
 import { Request, Response, NextFunction } from "express";
 import { Inventories } from "@prisma/client";
-import { Inventory } from "../types/types.js";
+import { Inventory, QueryParams } from "../types/types.js";
 import { TokenUserDataType } from "../types/types.js";
 
 interface AuthenticatedRequest extends Request {
@@ -12,9 +12,9 @@ const getAllInventoriesController = async (
   req: AuthenticatedRequest,
   res: Response,
   next: NextFunction
-): Promise<Response<any> | void> => {
+) => {
   try {
-    const queryParams: any = req?.query;
+    const queryParams: QueryParams = req?.query as QueryParams;
 
     const { sortBy, sortOrder, limit, page, ...filters } = queryParams;
 
@@ -91,11 +91,11 @@ const getAllInventoriesCountController = async (
   req: AuthenticatedRequest,
   res: Response,
   next: NextFunction
-): Promise<Response<any> | void> => {
+) => {
   try {
-    const queryParams: any = req?.query;
+    const queryParams: QueryParams = req?.query as QueryParams;
 
-    const { sortBy, sortOrder, limit, page, search, ...filters } = queryParams;
+    const { sortBy, sortOrder, limit, page, search, ...filters } = queryParams; // eslint-disable-line @typescript-eslint/no-unused-vars
 
     const andKeys = ["inventoryId", "storeId", "creatorId", "archived"];
     const orKeys: string[] = [];

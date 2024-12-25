@@ -1,14 +1,11 @@
 import productModel from "../models/productModel.js";
 import { Request, Response, NextFunction } from "express";
 import { Products } from "@prisma/client";
+import { QueryParams } from "types/types.js";
 
-const getAllProductsController = async (
-  req: Request,
-  res: Response,
-  next: NextFunction
-): Promise<Response<any> | void> => {
+const getAllProductsController = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const queryParams: any = req?.query;
+    const queryParams: QueryParams = req?.query as QueryParams;
 
     const { sortBy, sortOrder, limit, page, search, ...filters } = queryParams;
 
@@ -84,15 +81,11 @@ const getAllProductsController = async (
   }
 };
 
-const getAllProductsCountController = async (
-  req: Request,
-  res: Response,
-  next: NextFunction
-): Promise<Response<any> | void> => {
+const getAllProductsCountController = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const queryParams: any = req?.query;
+    const queryParams: QueryParams = req?.query as QueryParams;
 
-    const { sortBy, sortOrder, limit, page, search, ...filters } = queryParams;
+    const { sortBy, sortOrder, limit, page, search, ...filters } = queryParams; // eslint-disable-line @typescript-eslint/no-unused-vars
 
     const andKeys = ["productId", "productBarcode"];
     const orKeys: string[] = [];

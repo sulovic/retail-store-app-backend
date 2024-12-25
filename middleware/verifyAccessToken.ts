@@ -42,6 +42,9 @@ const verifyAccessToken = (route: keyof typeof priviledgesSchema) => async (req:
     if (error instanceof jwt.TokenExpiredError) {
       return res.status(401).json({ error: "Unauthorized - Access Token Expired" });
     }
+    if (error instanceof jwt.JsonWebTokenError) {
+      return res.status(401).json({ error: "Unauthorized - Invalid Access Token" });
+    }
     // Handle other unexpected errors
     next(error);
   }

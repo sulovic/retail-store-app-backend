@@ -2,20 +2,16 @@ import inventoryProductsModel from "../models/inventoryProductsModel.js";
 import inventoriesModel from "../models/inventoriesModel.js";
 import { Request, Response, NextFunction } from "express";
 import { InventoryProducts } from "@prisma/client";
-import { InventoryProduct } from "../types/types.js";
+import { InventoryProduct, QueryParams } from "../types/types.js";
 import { TokenUserDataType } from "../types/types.js";
 
 interface AuthenticatedRequest extends Request {
   authUser?: TokenUserDataType;
 }
 
-const getAllInventoryProductsController = async (
-  req: AuthenticatedRequest,
-  res: Response,
-  next: NextFunction
-): Promise<Response<any> | void> => {
+const getAllInventoryProductsController = async (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
   try {
-    const queryParams: any = req?.query;
+    const queryParams: QueryParams = req?.query as QueryParams;
 
     const { sortBy, sortOrder, limit, page, search, ...filters } = queryParams;
 
@@ -94,9 +90,9 @@ const getAllInventoryProductsController = async (
 
 const getAllInventoryProductsCountController = async (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
   try {
-    const queryParams: any = req?.query;
+    const queryParams: QueryParams = req?.query as QueryParams;
 
-    const { sortBy, sortOrder, limit, page, search, ...filters } = queryParams;
+    const { sortBy, sortOrder, limit, page, search, ...filters } = queryParams; // eslint-disable-line @typescript-eslint/no-unused-vars
 
     const andKeys = ["inventoryProductId", "inventoryId", "productId", "userId"];
     const orKeys: string[] = [];

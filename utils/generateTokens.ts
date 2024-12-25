@@ -1,7 +1,6 @@
 import jwt from "jsonwebtoken";
 import { storeRefreshToken } from "../models/userAuthModels.js";
-import { TokenUserDataType } from "../types/types.js"
-
+import { TokenUserDataType } from "../types/types.js";
 
 export const generateAccessToken = async (user: TokenUserDataType): Promise<string> => {
   const accessToken: string = jwt.sign(user, process.env.ACCESS_TOKEN_SECRET as string, {
@@ -15,11 +14,8 @@ export const generateRefreshToken = async (user: TokenUserDataType): Promise<str
     expiresIn: "1d",
   });
   // Save refresh token in database
-  try {
-    await storeRefreshToken(user.email, refreshToken);
-  } catch (error) {
-    throw error;
-  }
+
+  await storeRefreshToken(user.email, refreshToken);
 
   return refreshToken;
 };

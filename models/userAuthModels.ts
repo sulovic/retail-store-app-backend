@@ -1,4 +1,4 @@
-import { PrismaClient, Users } from "@prisma/client";
+import { PrismaClient } from "@prisma/client";
 import { AuthUserDataType } from "../types/types.js";
 
 const prisma = new PrismaClient();

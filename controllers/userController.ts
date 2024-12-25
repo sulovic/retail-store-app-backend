@@ -1,15 +1,10 @@
 import userModel from "../models/userModel.js";
 import { Request, Response, NextFunction } from "express";
-import { UserPublicDataType } from "../types/types.js";
-import { get } from "http";
+import { UserPublicDataType, QueryParams } from "../types/types.js";
 
-const getAllUsersController = async (
-  req: Request,
-  res: Response,
-  next: NextFunction
-): Promise<Response<any> | void> => {
+const getAllUsersController = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const queryParams: any = req?.query;
+    const queryParams: QueryParams = req?.query as QueryParams;
 
     const { sortBy, sortOrder, limit, page, search, ...filters } = queryParams;
 
@@ -78,15 +73,11 @@ const getAllUsersController = async (
   }
 };
 
-const getAllUsersCountController = async (
-  req: Request,
-  res: Response,
-  next: NextFunction
-): Promise<Response<any> | void> => {
+const getAllUsersCountController = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const queryParams: any = req?.query;
+    const queryParams: QueryParams = req?.query as QueryParams;
 
-    const { sortBy, sortOrder, limit, page, search, ...filters } = queryParams;
+    const { sortBy, sortOrder, limit, page, search, ...filters } = queryParams; // eslint-disable-line @typescript-eslint/no-unused-vars
 
     const andKeys = ["userId", "roleId"];
     const orKeys: string[] = [];
@@ -138,7 +129,7 @@ const getAllUsersCountController = async (
   }
 };
 
-const getUserController = async (req: Request, res: Response, next: NextFunction): Promise<Response<any> | void> => {
+const getUserController = async (req: Request, res: Response, next: NextFunction): Promise<Response | void> => {
   try {
     const userId: number = parseInt(req.params.userId);
     if (isNaN(userId)) {
@@ -155,7 +146,7 @@ const getUserController = async (req: Request, res: Response, next: NextFunction
   }
 };
 
-const createUserController = async (req: Request, res: Response, next: NextFunction): Promise<Response<any> | void> => {
+const createUserController = async (req: Request, res: Response, next: NextFunction): Promise<Response | void> => {
   try {
     const user: Omit<UserPublicDataType, "userId"> = req.body;
     const newUser: UserPublicDataType = await userModel.createUser(user);
@@ -165,7 +156,7 @@ const createUserController = async (req: Request, res: Response, next: NextFunct
   }
 };
 
-const updateUserController = async (req: Request, res: Response, next: NextFunction): Promise<Response<any> | void> => {
+const updateUserController = async (req: Request, res: Response, next: NextFunction): Promise<Response | void> => {
   try {
     const user: UserPublicDataType = req.body;
     const updatedUser: UserPublicDataType = await userModel.updateUser(user);
@@ -175,7 +166,7 @@ const updateUserController = async (req: Request, res: Response, next: NextFunct
   }
 };
 
-const deleteUserController = async (req: Request, res: Response, next: NextFunction): Promise<Response<any> | void> => {
+const deleteUserController = async (req: Request, res: Response, next: NextFunction): Promise<Response | void> => {
   try {
     const userId: number = parseInt(req.params.userId);
     const deletedUser: UserPublicDataType = await userModel.deleteUser(userId);

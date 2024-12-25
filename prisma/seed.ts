@@ -1,5 +1,4 @@
 import pkg from "@prisma/client";
-import { arch } from "os";
 const { PrismaClient } = pkg;
 const prisma = new PrismaClient();
 

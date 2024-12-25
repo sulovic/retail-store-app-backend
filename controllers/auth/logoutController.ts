@@ -6,7 +6,7 @@ import { removeRefreshToken } from "../../models/userAuthModels.js";
 
 type UserPublicDataType = Omit<Users, "password" | "refreshToken" | "roleId" | "createdAt">;
 
-const logoutController = async (req: Request, res: Response, next: NextFunction): Promise<Response<any> | void> => {
+const logoutController = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const refreshToken: string = req?.cookies?.refreshToken;
 
