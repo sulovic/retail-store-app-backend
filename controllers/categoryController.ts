@@ -1,4 +1,4 @@
-import categoryModel from "@models/categoryModel.js";
+import categoryModel from "../models/categoryModel.js";
 import { Request, Response, NextFunction } from "express";
 import { Categories } from "@prisma/client";
 import { QueryParams } from "types/types.js";
@@ -150,6 +150,21 @@ const getCategoryController = async (req: Request, res: Response, next: NextFunc
 const createCategoryController = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const category: Omit<Categories, "categoryId"> = req.body;
+
+    if (category.categoryName.toLowerCase() !== category.categoryPath.split("/").pop()) {
+      return res.status(400).json({ message: "Category name and path do not match" });
+    }
+
+    const parentCategoryPath = category.categoryPath.split("/").slice(0, -1).join("/");
+
+    const parentCategoryExists = await categoryModel.getAllCategories({
+      whereClause: { categoryPath: parentCategoryPath },
+    });
+
+    if (!parentCategoryExists.length) {
+      return res.status(400).json({ message: "Parent category does not exist" });
+    }
+
     const newCategory: Categories = await categoryModel.createCategory(category);
     return res.status(201).json(newCategory);
   } catch (error) {
@@ -160,6 +175,21 @@ const createCategoryController = async (req: Request, res: Response, next: NextF
 const updateCategoryController = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const category: Categories = req.body;
+
+    if (category.categoryName.toLowerCase() !== category.categoryPath.split("/").pop()) {
+      return res.status(400).json({ message: "Category name and path do not match" });
+    }
+
+    const parentCategoryPath = category.categoryPath.split("/").slice(0, -1).join("/");
+
+    const parentCategoryExists = await categoryModel.getAllCategories({
+      whereClause: { categoryPath: parentCategoryPath },
+    });
+
+    if (!parentCategoryExists.length) {
+      return res.status(400).json({ message: "Parent category does not exist" });
+    }
+
     const updatedCategory: Categories = await categoryModel.updateCategory(category);
     return res.status(200).json(updatedCategory);
   } catch (error) {

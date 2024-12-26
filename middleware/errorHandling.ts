@@ -15,7 +15,6 @@ const errorHandler: ErrorRequestHandler = (
 ): void => {
   // Implement Error Logger
 
-console.log("here", err.message)
   if (err instanceof Prisma.PrismaClientKnownRequestError) {
     if (err.code === "P2002") {
       res.status(409).json({ message: "Duplicate entry detected." });

@@ -116,7 +116,7 @@ model Procurements {
 model Categories {
     categoryId   Int        @id @default(autoincrement())
     categoryName String     @db.VarChar(256)
-    categoryPath String     @db.VarChar(256)
+    categoryPath String     @db.VarChar(256) @unique
     Products     Products[]
 
     @@index([categoryId])
