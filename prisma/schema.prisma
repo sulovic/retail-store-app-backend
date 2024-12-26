@@ -46,6 +46,7 @@ model Products {
     deletedAt         DateTime?
     InventoryProducts InventoryProducts[]
     Procurements      Procurements[]
+    Categories        Categories[]
 
     @@index([productId])
     @@index([productName])
@@ -78,7 +79,9 @@ model InventoryProducts {
     productQuantity    Float
     productPrice       Float
 
-    @@index([inventoryProductId, inventoryId, productId])
+    @@index([inventoryProductId])
+    @@index([productId])
+    @@index([inventoryId])
 }
 
 model Stores {
@@ -93,7 +96,6 @@ model Stores {
 
     @@index([storeId])
     @@index([storeName])
-    @@index([storeAddress])
 }
 
 model Procurements {
@@ -107,4 +109,17 @@ model Procurements {
     Users           Users    @relation(fields: [userId], references: [userId])
     completed       Boolean?
     createdAt       DateTime @default(now())
+
+    @@index([procurementId])
+}
+
+model Categories {
+    categoryId   Int        @id @default(autoincrement())
+    categoryName String     @db.VarChar(256)
+    categoryPath String     @db.VarChar(256)
+    Products     Products[]
+
+    @@index([categoryId])
+    @@index([categoryName])
+    @@index([categoryPath])
 }

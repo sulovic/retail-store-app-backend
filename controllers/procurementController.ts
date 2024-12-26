@@ -1,4 +1,4 @@
-import procurementsModel from "../models/procurementsModel.js";
+import procurementsModel from "../models/procurementModel.js";
 import { Request, Response, NextFunction } from "express";
 import { Procurements } from "@prisma/client";
 import { Procurement, QueryParams } from "../types/types.js";
@@ -12,7 +12,7 @@ const getAllProcurementsController = async (req: AuthenticatedRequest, res: Resp
   try {
     const queryParams: QueryParams = req?.query as QueryParams;
 
-    const { sortBy, sortOrder, limit, page, search, ...filters } = queryParams;
+    const { sortBy, sortOrder, limit, page, ...filters } = queryParams;
 
     const take: number | undefined = limit ? parseInt(limit) : undefined;
     const skip: number | undefined = page && limit ? (parseInt(page) - 1) * parseInt(limit) : undefined;
@@ -56,15 +56,6 @@ const getAllProcurementsController = async (req: AuthenticatedRequest, res: Resp
       }
     });
 
-    if (search) {
-      andConditions.push({
-        OR: [
-          { Products: { productName: { contains: search } } },
-          { Products: { productBarcode: { contains: search } } },
-          { Products: { productDesc: { contains: search } } },
-        ],
-      });
-    }
     // Check if the user is authorized to access all procurements, return only their Store procurements otherwise
     if (!req.authUser || req.authUser.UserRoles.roleId < 3000) {
       andConditions.push({ Stores: { storeId: { in: req.authUser?.Stores.map((store) => store.storeId) || [] } } });
@@ -91,7 +82,7 @@ const getAllProcurementsCountController = async (req: AuthenticatedRequest, res:
   try {
     const queryParams: QueryParams = req?.query as QueryParams;
 
-    const { sortBy, sortOrder, limit, page, search, ...filters } = queryParams; // eslint-disable-line @typescript-eslint/no-unused-vars
+    const { sortBy, sortOrder, limit, page, ...filters } = queryParams; // eslint-disable-line @typescript-eslint/no-unused-vars
 
     const andKeys = ["procurementId", "productId", "storeId", "userId"];
     const orKeys: string[] = [];
@@ -125,15 +116,7 @@ const getAllProcurementsCountController = async (req: AuthenticatedRequest, res:
       }
     });
 
-    if (search) {
-      andConditions.push({
-        OR: [
-          { Products: { productName: { contains: search } } },
-          { Products: { productBarcode: { contains: search } } },
-          { Products: { productDesc: { contains: search } } },
-        ],
-      });
-    }
+  
     // Check if the user is authorized to access all procurements, return only their Store procurements otherwise
     if (!req.authUser || req.authUser.UserRoles.roleId < 3000) {
       andConditions.push({ Stores: { storeId: { in: req.authUser?.Stores.map((store) => store.storeId) || [] } } });

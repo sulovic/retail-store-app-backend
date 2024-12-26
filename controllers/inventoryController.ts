@@ -1,4 +1,4 @@
-import inventoryModel from "../models/inventoriesModel.js";
+import inventoryModel from "../models/inventoryModel.js";
 import { Request, Response, NextFunction } from "express";
 import { Inventories } from "@prisma/client";
 import { Inventory, QueryParams } from "../types/types.js";

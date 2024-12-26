@@ -1,4 +1,4 @@
-import storesModel from "../models/storesModel.js";
+import storesModel from "../models/storeModel.js";
 import { Request, Response, NextFunction } from "express";
 import { Stores } from "@prisma/client";
 

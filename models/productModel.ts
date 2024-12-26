@@ -2,7 +2,17 @@ import { PrismaClient, Products } from "@prisma/client";
 
 const prisma = new PrismaClient();
 
-const getAllProducts = async ({ whereClause, orderBy, take, skip }: { whereClause: object; orderBy?: object; take?: number; skip?: number }): Promise<Products[]> => {
+const getAllProducts = async ({
+  whereClause,
+  orderBy,
+  take,
+  skip,
+}: {
+  whereClause: object;
+  orderBy?: object;
+  take?: number;
+  skip?: number;
+}): Promise<Products[]> => {
   return await prisma.products.findMany({
     where: { ...whereClause, deleted: false },
     orderBy,
@@ -22,6 +32,9 @@ const getProduct = async (productId: number): Promise<Products | null> => {
     where: {
       productId,
       deleted: false,
+    },
+    include: {
+      Categories: true,
     },
   });
 };

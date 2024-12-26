@@ -1,4 +1,4 @@
-import userRolesModel from "../models/userRole.js";
+import userRolesModel from "../models/userRoleModel.js";
 import { Request, Response, NextFunction } from "express";
 import { UserRoles } from "@prisma/client";
 
