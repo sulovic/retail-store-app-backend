@@ -49,6 +49,10 @@ const priviledgesSchema: PrivilegesSchema = {
     PUT: 1000,
     DELETE: 1000,
   },
+  uploads: {
+    POST: 3000,
+    DELETE: 3000,
+  },
 };
 
 export default priviledgesSchema;

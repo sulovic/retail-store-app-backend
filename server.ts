@@ -23,6 +23,7 @@ import inventoryProductsRoutes from "./routes/InventoryProductsRoutes.js";
 import storeRoutes from "./routes/storeRoutes.js";
 import procurementRoutes from "./routes/procurementRoutes.js";
 import categoryRoutes from "./routes/categoryRoutes.js"
+import uploadRoutes from "./routes/uploadRoutes.js";
 
 // Initialize app and constants
 
@@ -57,6 +58,7 @@ app.use("/api/users", verifyAccessToken("users"), userRoutes);
 app.use("/api/stores", verifyAccessToken("stores"), storeRoutes);
 app.use("/api/procurements", verifyAccessToken("procurements"), procurementRoutes);
 app.use("/api/categories", verifyAccessToken("categories"), categoryRoutes);
+app.use("/api/uploads", verifyAccessToken("uploads"), uploadRoutes);
 
 
 // Error handling middleware
