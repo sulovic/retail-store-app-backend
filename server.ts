@@ -22,7 +22,7 @@ import inventoryRoutes from "./routes/inventoryRoutes.js";
 import inventoryProductsRoutes from "./routes/InventoryProductsRoutes.js";
 import storeRoutes from "./routes/storeRoutes.js";
 import procurementRoutes from "./routes/procurementRoutes.js";
-import categoryRoutes from "./routes/categoryRoutes.js"
+import categoryRoutes from "./routes/categoryRoutes.js";
 import uploadRoutes from "./routes/uploadRoutes.js";
 
 // Initialize app and constants
@@ -60,27 +60,18 @@ app.use("/api/procurements", verifyAccessToken("procurements"), procurementRoute
 app.use("/api/categories", verifyAccessToken("categories"), categoryRoutes);
 app.use("/api/uploads", verifyAccessToken("uploads"), uploadRoutes);
 
-
 // Error handling middleware
 
 app.use(errorHandler);
 
 // Start server
 
-app.listen(PORT, () => console.log(`Server listening on port ${PORT}`));
+const server = app.listen(PORT, () => console.log(`Server listening on port ${PORT}`));
 
-//HTTPS Server for testing
-
-// import https from "https";
-// import fs from "fs";
-// const options = {
-//   key: fs.readFileSync(`./key.pem`),
-//   cert: fs.readFileSync("./cert.pem"),
-// };
-
-// const server = https.createServer(options, app);
-
-// server.listen(PORT, () => {
-//   console.log(`HTTPS Server running at port ${PORT}`);
-// });
-//END HTTPS Server for testing
+process.on("SIGTERM", () => {
+  console.log("Received SIGTERM. Shutting down gracefully...");
+  server.close(() => {
+    console.log("Closed all remaining connections");
+    process.exit(0);
+  });
+});
