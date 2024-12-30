@@ -118,3 +118,16 @@ export type  QueryParams = {
   search?: string;
   [key: string]: string | undefined;
 }
+
+export type Product = {
+  productId: number;
+  productBarcode: string;
+  productName: string;
+  productPrice: number;
+  productDesc: string | null;
+  productImage: string | null;
+  Categories: {
+    categoryId: number;
+    categoryName: string;
+  }[];
+};

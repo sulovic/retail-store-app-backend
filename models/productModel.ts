@@ -1,4 +1,5 @@
-import { PrismaClient, Products } from "@prisma/client";
+import { PrismaClient } from "@prisma/client";
+import { Product } from "types/types.js";
 
 const prisma = new PrismaClient();
 
@@ -12,12 +13,26 @@ const getAllProducts = async ({
   orderBy?: object;
   take?: number;
   skip?: number;
-}): Promise<Products[]> => {
+}): Promise<Product[]> => {
   return await prisma.products.findMany({
     where: { ...whereClause, deleted: false },
     orderBy,
     take,
     skip,
+    select: {
+      productId: true,
+      productName: true,
+      productBarcode: true,
+      productPrice: true,
+      productDesc: true,
+      productImage: true,
+      Categories: {
+        select: {
+          categoryId: true,
+          categoryName: true,
+        },
+      },
+    },
   });
 };
 
@@ -27,37 +42,89 @@ const getAllProductsCount = async ({ whereClause }: { whereClause: object }): Pr
   });
 };
 
-const getProduct = async (productId: number): Promise<Products | null> => {
+const getProduct = async (productId: number): Promise<Product | null> => {
   return await prisma.products.findUnique({
     where: {
       productId,
       deleted: false,
     },
-    include: {
-      Categories: true,
+    select: {
+      productId: true,
+      productName: true,
+      productBarcode: true,
+      productPrice: true,
+      productDesc: true,
+      productImage: true,
+      Categories: {
+        select: {
+          categoryId: true,
+          categoryName: true,
+        },
+      },
     },
   });
 };
 
-const createProduct = async (product: Omit<Products, "productId">): Promise<Products> => {
+const createProduct = async (product: Omit<Product, "productId">): Promise<Product> => {
   return await prisma.products.create({
-    data: product,
+    data: {
+      ...product,
+      Categories: {
+       connect: product.Categories.map((category) => ({
+         categoryId: category.categoryId,
+       }))
+      },
+    },
+    select: {
+      productId: true,
+      productName: true,
+      productBarcode: true,
+      productPrice: true,
+      productDesc: true,
+      productImage: true,
+      Categories: {
+        select: {
+          categoryId: true,
+          categoryName: true,
+        },
+      },
+    },
   });
 };
 
-const updateProduct = async (product: Products): Promise<Products> => {
-  const { productId, ...data } = product;
-
+const updateProduct = async (product: Product): Promise<Product> => {
   return await prisma.products.update({
     where: {
-      productId,
+      productId: product.productId,
       deleted: false,
     },
-    data,
+    data: {
+      ...product,
+      Categories: {
+        set: [],
+        connect: product.Categories.map((category) => ({
+          categoryId: category.categoryId,
+        })),
+      },
+    },
+    select: {
+      productId: true,
+      productName: true,
+      productBarcode: true,
+      productPrice: true,
+      productDesc: true,
+      productImage: true,
+      Categories: {
+        select: {
+          categoryId: true,
+          categoryName: true,
+        },
+      },
+    },
   });
 };
 
-const deleteProduct = async (productId: number): Promise<Products> => {
+const deleteProduct = async (productId: number): Promise<Product> => {
   // SOFT DELETION
   return await prisma.products.update({
     where: {
@@ -68,12 +135,26 @@ const deleteProduct = async (productId: number): Promise<Products> => {
       deleted: true,
       deletedAt: new Date(),
     },
+    select: {
+      productId: true,
+      productName: true,
+      productBarcode: true,
+      productPrice: true,
+      productDesc: true,
+      productImage: true,
+      Categories: {
+        select: {
+          categoryId: true,
+          categoryName: true,
+        },
+      },
+    },
   });
 };
 
-const bulkUploadProducts = async (products: Omit<Products, "productId">[]): Promise<Products[]> => {
+const bulkUploadProducts = async (products: Omit<Product, "productId">[]): Promise<Product[]> => {
   const chunkSize = 100;
-  const chunkArray = (array: Omit<Products, "productId">[], size: number) => {
+  const chunkArray = (array: Omit<Product, "productId">[], size: number) => {
     const chunks = [];
     for (let i = 0; i < array.length; i += size) {
       chunks.push(array.slice(i, i + size));
@@ -87,7 +168,7 @@ const bulkUploadProducts = async (products: Omit<Products, "productId">[]): Prom
 
   for (const chunk of productChunks) {
     const uploadedChunk = await Promise.all(
-      chunk.map((product: Omit<Products, "productId">) => {
+      chunk.map((product: Omit<Product, "productId">) => {
         // Map update data to remove empty strings or invalid price
         const updateData: Partial<typeof product> = {};
 
@@ -107,8 +188,34 @@ const bulkUploadProducts = async (products: Omit<Products, "productId">[]): Prom
             productBarcode: product.productBarcode,
             deleted: false,
           },
-          update: updateData,
-          create: product,
+          update: {
+            ...updateData,
+            Categories: {
+              set: [],
+              connect: updateData.Categories?.map((category) => ({
+                categoryId: category.categoryId,
+              })),
+            },
+          },
+          create: { ...product, Categories: {
+            connect: product.Categories?.map((category) => ({
+              categoryId: category.categoryId,
+            })),
+          }, },
+          select: {
+            productId: true,
+            productName: true,
+            productBarcode: true,
+            productPrice: true,
+            productDesc: true,
+            productImage: true,
+            Categories: {
+              select: {
+                categoryId: true,
+                categoryName: true,
+              },
+            },
+          },
         });
       })
     );
