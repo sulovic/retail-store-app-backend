@@ -17,12 +17,11 @@ const getAllProcurementsController = async (req: AuthenticatedRequest, res: Resp
     const take: number | undefined = limit ? parseInt(limit) : undefined;
     const skip: number | undefined = page && limit ? (parseInt(page) - 1) * parseInt(limit) : undefined;
 
-    const orderBy: object | undefined =
-      sortBy && sortOrder
-        ? {
-            [sortBy]: sortOrder,
-          }
-        : undefined;
+    const orderBy: object | undefined = sortBy
+      ? {
+          [sortBy]: sortOrder || "asc",
+        }
+      : undefined;
 
     const andKeys = ["procurementId", "productId", "storeId", "userId"];
     const orKeys: string[] = [];
@@ -116,7 +115,6 @@ const getAllProcurementsCountController = async (req: AuthenticatedRequest, res:
       }
     });
 
-  
     // Check if the user is authorized to access all procurements, return only their Store procurements otherwise
     if (!req.authUser || req.authUser.UserRoles.roleId < 3000) {
       andConditions.push({ Stores: { storeId: { in: req.authUser?.Stores.map((store) => store.storeId) || [] } } });

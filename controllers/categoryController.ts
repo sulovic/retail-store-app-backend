@@ -12,12 +12,11 @@ const getAllCategoriesController = async (req: Request, res: Response, next: Nex
     const take: number | undefined = limit ? parseInt(limit) : undefined;
     const skip: number | undefined = page && limit ? (parseInt(page) - 1) * parseInt(limit) : undefined;
 
-    const orderBy: object | undefined =
-      sortBy && sortOrder
-        ? {
-            [sortBy]: sortOrder,
-          }
-        : undefined;
+    const orderBy: object | undefined = sortBy
+      ? {
+          [sortBy]: sortOrder || "asc",
+        }
+      : undefined;
 
     const andKeys = ["categoryId", "categoryName", "categoryPath"];
     const orKeys: string[] = [];

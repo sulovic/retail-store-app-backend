@@ -8,11 +8,7 @@ interface AuthenticatedRequest extends Request {
   authUser?: TokenUserDataType;
 }
 
-const getAllInventoriesController = async (
-  req: AuthenticatedRequest,
-  res: Response,
-  next: NextFunction
-) => {
+const getAllInventoriesController = async (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
   try {
     const queryParams: QueryParams = req?.query as QueryParams;
 
@@ -21,12 +17,11 @@ const getAllInventoriesController = async (
     const take: number | undefined = limit ? parseInt(limit) : undefined;
     const skip: number | undefined = page && limit ? (parseInt(page) - 1) * parseInt(limit) : undefined;
 
-    const orderBy: object | undefined =
-      sortBy && sortOrder
-        ? {
-            [sortBy]: sortOrder,
-          }
-        : undefined;
+    const orderBy: object | undefined = sortBy
+      ? {
+          [sortBy]: sortOrder || "asc",
+        }
+      : undefined;
 
     const andKeys = ["inventoryId", "storeId", "creatorId", "archived"];
     const orKeys: string[] = [];
@@ -87,11 +82,7 @@ const getAllInventoriesController = async (
   }
 };
 
-const getAllInventoriesCountController = async (
-  req: AuthenticatedRequest,
-  res: Response,
-  next: NextFunction
-) => {
+const getAllInventoriesCountController = async (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
   try {
     const queryParams: QueryParams = req?.query as QueryParams;
 

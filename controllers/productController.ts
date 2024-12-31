@@ -9,15 +9,14 @@ const getAllProductsController = async (req: Request, res: Response, next: NextF
 
     const { sortBy, sortOrder, limit, page, search, categoryPath, ...filters } = queryParams;
 
-    const take: number | undefined = limit ? parseInt(limit) : undefined;
-    const skip: number | undefined = page && limit ? (parseInt(page) - 1) * parseInt(limit) : undefined;
+    const take: number | undefined = limit ? parseInt(limit) : 100; // default to 100 to avoid excessive data
+    const skip: number | undefined = page && limit ? (parseInt(page) - 1) * parseInt(limit) : 0;
 
-    const orderBy: object | undefined =
-      sortBy && sortOrder
-        ? {
-            [sortBy]: sortOrder,
-          }
-        : undefined;
+    const orderBy: object | undefined = sortBy
+      ? {
+          [sortBy]: sortOrder || "asc",
+        }
+      : undefined;
 
     const andKeys = ["productId", "productBarcode"];
     const orKeys: string[] = [];

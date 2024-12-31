@@ -18,12 +18,11 @@ const getAllInventoryProductsController = async (req: AuthenticatedRequest, res:
     const take: number | undefined = limit ? parseInt(limit) : undefined;
     const skip: number | undefined = page && limit ? (parseInt(page) - 1) * parseInt(limit) : undefined;
 
-    const orderBy: object | undefined =
-      sortBy && sortOrder
-        ? {
-            [sortBy]: sortOrder,
-          }
-        : undefined;
+    const orderBy: object | undefined = sortBy
+      ? {
+          [sortBy]: sortOrder || "asc",
+        }
+      : undefined;
 
     const andKeys = ["inventoryProductId", "inventoryId", "productId", "userId"];
     const orKeys: string[] = [];

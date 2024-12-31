@@ -24,6 +24,7 @@ import storeRoutes from "./routes/storeRoutes.js";
 import procurementRoutes from "./routes/procurementRoutes.js";
 import categoryRoutes from "./routes/categoryRoutes.js";
 import uploadRoutes from "./routes/uploadRoutes.js";
+import publcProudctRoutes from "./routes/publicProductRoutes.js";
 
 // Initialize app and constants
 
@@ -37,11 +38,12 @@ if (process.env.NODE_ENV === "production") {
 }
 
 // Middleware setup
-
 app.use(cors(corsConfig));
 app.use(express.json({ limit: "10mb" }));
 app.use(express.urlencoded({ limit: "10mb", extended: true }));
 app.use(cookieParser());
+
+// Serve static files
 app.use(express.static(path.join(__dirname, "public")));
 
 // Auth routes
@@ -49,7 +51,7 @@ app.use("/login", loginRoute);
 app.use("/logout", logoutRoute);
 app.use("/refresh", refreshRoute);
 
-// Data Routes
+// Protected data Routes
 app.use("/api/products", verifyAccessToken("products"), productRoutes);
 app.use("/api/inventories", verifyAccessToken("inventories"), inventoryRoutes);
 app.use("/api/inventory-products", verifyAccessToken("inventoryProducts"), inventoryProductsRoutes);
@@ -60,8 +62,10 @@ app.use("/api/procurements", verifyAccessToken("procurements"), procurementRoute
 app.use("/api/categories", verifyAccessToken("categories"), categoryRoutes);
 app.use("/api/uploads", verifyAccessToken("uploads"), uploadRoutes);
 
-// Error handling middleware
+//Public data Routes
+app.use("/api/public/products", publcProudctRoutes);
 
+// Error handling middleware
 app.use(errorHandler);
 
 // Start server
