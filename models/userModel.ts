@@ -3,7 +3,17 @@ import { UserPublicDataType } from "../types/types.js";
 
 const prisma = new PrismaClient();
 
-const getAllUsers = async ({ whereClause, orderBy, take, skip }: { whereClause?: object; orderBy?: object; take?: number; skip?: number }): Promise<UserPublicDataType[]> => {
+const getAllUsers = async ({
+  whereClause,
+  orderBy,
+  take,
+  skip,
+}: {
+  whereClause?: object;
+  orderBy?: object;
+  take?: number;
+  skip?: number;
+}): Promise<UserPublicDataType[]> => {
   return await prisma.users.findMany({
     where: { ...whereClause, deleted: false },
     orderBy,

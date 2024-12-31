@@ -8,4 +8,4 @@ const getAllUserRoles = async (): Promise<UserRoles[]> => {
 
 export default {
   getAllUserRoles,
-}
+};

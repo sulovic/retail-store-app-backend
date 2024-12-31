@@ -3,7 +3,17 @@ import { InventoryProduct } from "../types/types.js";
 
 const prisma = new PrismaClient();
 
-const getAllInventoryProducts = async ({ whereClause, orderBy, take, skip }: { whereClause?: object; orderBy?: object; take?: number; skip?: number }): Promise<InventoryProduct[]> => {
+const getAllInventoryProducts = async ({
+  whereClause,
+  orderBy,
+  take,
+  skip,
+}: {
+  whereClause?: object;
+  orderBy?: object;
+  take?: number;
+  skip?: number;
+}): Promise<InventoryProduct[]> => {
   return await prisma.inventoryProducts.findMany({
     where: whereClause,
     orderBy,
@@ -66,7 +76,9 @@ const getInventoryProduct = async (inventoryProductId: number): Promise<Inventor
   });
 };
 
-const createInventoryProduct = async (inventoryProduct: Omit<InventoryProducts, "inventoryProductId">): Promise<InventoryProducts> => {
+const createInventoryProduct = async (
+  inventoryProduct: Omit<InventoryProducts, "inventoryProductId">
+): Promise<InventoryProducts> => {
   return await prisma.inventoryProducts.create({
     data: inventoryProduct,
   });

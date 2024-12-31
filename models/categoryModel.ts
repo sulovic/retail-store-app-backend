@@ -8,7 +8,7 @@ const getAllCategories = async ({
   take,
   skip,
 }: {
-  whereClause: object;
+  whereClause?: object;
   orderBy?: object;
   take?: number;
   skip?: number;
@@ -21,7 +21,7 @@ const getAllCategories = async ({
   });
 };
 
-const getAllCategoriesCount = async ({ whereClause }: { whereClause: object }): Promise<number> => {
+const getAllCategoriesCount = async ({ whereClause }: { whereClause?: object }): Promise<number> => {
   return await prisma.categories.count({
     where: { ...whereClause },
   });

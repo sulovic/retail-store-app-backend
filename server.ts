@@ -25,6 +25,7 @@ import procurementRoutes from "./routes/procurementRoutes.js";
 import categoryRoutes from "./routes/categoryRoutes.js";
 import uploadRoutes from "./routes/uploadRoutes.js";
 import publcProudctRoutes from "./routes/publicProductRoutes.js";
+import publicCategoryRoutes from "./routes/publicCategoryRoutes.js";
 
 // Initialize app and constants
 
@@ -64,6 +65,7 @@ app.use("/api/uploads", verifyAccessToken("uploads"), uploadRoutes);
 
 //Public data Routes
 app.use("/api/public/products", publcProudctRoutes);
+app.use("/api/public/categories", publicCategoryRoutes);
 
 // Error handling middleware
 app.use(errorHandler);

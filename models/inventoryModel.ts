@@ -3,7 +3,17 @@ import { Inventory } from "../types/types.js";
 
 const prisma = new PrismaClient();
 
-const getAllInventories = async ({ whereClause, orderBy, take, skip }: { whereClause?: object; orderBy?: object; take?: number; skip?: number }): Promise<Inventory[]> => {
+const getAllInventories = async ({
+  whereClause,
+  orderBy,
+  take,
+  skip,
+}: {
+  whereClause?: object;
+  orderBy?: object;
+  take?: number;
+  skip?: number;
+}): Promise<Inventory[]> => {
   return await prisma.inventories.findMany({
     select: {
       inventoryId: true,
