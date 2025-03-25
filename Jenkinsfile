@@ -1,5 +1,5 @@
 pipeline {
-    agent { label 'production-server' } // Define the agent at the top for the entire pipeline
+    agent any
     
     environment {
         GIT_URL = 'https://github.com/sulovic/retail-store-app-backend'
