@@ -1,44 +1,86 @@
 pipeline {
-    agent {
-        docker {
-            image 'node:alpine' 
-            args '-p 5999:5999'
-        }
-    }
+    agent { label 'production-server' } // Define the agent at the top for the entire pipeline
+    
     environment {
-        PORT = 5999
+        GIT_URL = 'https://github.com/sulovic/retail-store-app-backend'
+        BRANCH = 'main'
+        GIT_CREDENTIALS = 'github-credentials'
+        SERVER_CREDENTIALS = 'server-credentials'  // Set the Jenkins SSH credentials ID here
+        REMOTE_DIR = '/var/www/retail-store-backend/'
+        PRODUCTION_SERVER = '94.130.73.137'
     }
+
     stages {
         stage('Clone Repository') {
             steps {
-                git branch: 'main', 
-                url: 'https://github.com/your-username/your-repo.git',
-                credentialsId: 'github-credentials'
+                script {
+                    // SSH into the server and clone the repo
+                    sshagent(credentials: [SERVER_CREDENTIALS]) {
+                        sh """
+                            cd ${REMOTE_DIR} &&
+                            git clone -b ${BRANCH} ${GIT_URL} ${REMOTE_DIR}
+                        """
+                    }
+                }
             }
         }
+
         stage('Install Dependencies') {
             steps {
-                sh 'npm install' 
+                script {
+                    // SSH into the server and install dependencies
+                    sshagent(credentials: [SSH_KEY_ID]) {
+                        sh """
+                            npm install
+                        """
+                    }
+                }
             }
         }
-        stage('Run Lints') {
-            steps {
-                sh 'npm run lint' 
-            }
-        }
+
         stage('Run Tests') {
             steps {
-                sh 'npm run test' 
+                script {
+                    // SSH into the server and run tests
+                    sshagent(credentials: [SSH_KEY_ID]) {
+                        sh """
+                            cd ${REMOTE_DIR} &&
+                            npm test
+                        """
+                    }
+                }
             }
         }
-        stage('Build Application') {
+
+        stage('Build') {
             steps {
-                sh 'npm run build' 
+                script {
+                    // SSH into the server and run the build
+                    sshagent(credentials: [SSH_KEY_ID]) {
+                        sh """
+                            cd ${REMOTE_DIR} &&
+                            npm run build
+                        """
+                    }
+                }
             }
         }
-        stage('Start Application') {
+
+        stage('Deploy to Production') {
             steps {
-                sh 'cd /dist && node server.js' 
+                script {
+                    // SSH into the production server and deploy the application
+                    sshagent(credentials: [SSH_KEY_ID]) {
+                        sh """
+                            ssh ${PRODUCTION_SERVER} "
+                                cd ${REMOTE_DIR} &&
+                                git pull origin ${BRANCH} &&
+                                npm install &&
+                                npm run build &&
+                                pm2 restart all"
+                        """
+                    }
+                }
             }
         }
     }
