@@ -17,6 +17,7 @@ pipeline {
                     // SSH into the server and clone the repo
                     sshagent(credentials: [SERVER_CREDENTIALS]) {
                         sh """
+                            ls -la &&
                             cd ${REMOTE_DIR} &&
                             git clone -b ${BRANCH} ${GIT_URL} ${REMOTE_DIR}
                         """
