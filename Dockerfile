@@ -5,6 +5,9 @@ FROM node:20-alpine
 # Install necessary libraries (including OpenSSL)
 RUN apk add --no-cache openssl
 
+# Install PM2 globally
+RUN npm install -g pm2
+
 # Set the working directory inside the container
 WORKDIR /usr/src/app
 
@@ -31,4 +34,4 @@ RUN npm run build
 EXPOSE 5999
 
 # Define the command to start the app
-CMD ["npm", "start"]
+CMD ["pm2-runtime", "./dist/server.js", "--name", "retail-store-app-backend"]
