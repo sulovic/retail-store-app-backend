@@ -30,7 +30,7 @@ import publicCategoryRoutes from "./routes/publicCategoryRoutes.js";
 // Initialize app and constants
 
 const app = express();
-const PORT: number = process.env.PORT ? parseInt(process.env.PORT) : 5000;
+const PORT: number = process.env.PORT ? parseInt(process.env.PORT) : 5999;
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
