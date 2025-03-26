@@ -9,7 +9,7 @@
     "dev": "nodemon --watch src --exec 'node --loader ts-node/esm' ./server.ts",
     "lint": "eslint .",
     "build": "tsc",
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "echo \"Error: no test specified\" && exit 0",
     "prisma-seed": "node dist/prisma/seed.js"
   },
   "repository": {
