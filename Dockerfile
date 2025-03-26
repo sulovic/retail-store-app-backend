@@ -3,7 +3,7 @@
 FROM node:20-alpine
 
 # Install necessary libraries (including OpenSSL)
-RUN apk add --no-cache libssl1.1
+RUN apk add --no-cache openssl
 
 # Set the working directory inside the container
 WORKDIR /usr/src/app
