@@ -14,6 +14,9 @@ RUN npm install && npm install nodemon --save-dev
 # Copy the rest of the application code to the container
 COPY . .
 
+# Run the build step
+RUN npm run build
+
 # Expose the application port (replace 3000 with your app's port)
 EXPOSE 5999
 
