@@ -14,7 +14,6 @@ WORKDIR /usr/src/app
 # Accept build arguments and set them as environment variables
 ARG DATABASE_RETAILSTORE_URL
 ENV DATABASE_RETAILSTORE_URL=$DATABASE_RETAILSTORE_URL
-echo $DATABASE_RETAILSTORE_URL
 
 # Copy package.json and package-lock.json to the container
 COPY package*.json ./
