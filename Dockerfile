@@ -9,7 +9,7 @@ WORKDIR /usr/src/app
 COPY package*.json ./
 
 # Install dependencies
-RUN npm install --production
+RUN npm install && npm install nodemon --save-dev
 
 # Copy the rest of the application code to the container
 COPY . .
