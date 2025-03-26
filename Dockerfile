@@ -14,6 +14,9 @@ RUN npm install && npm install nodemon --save-dev
 # Copy the rest of the application code to the container
 COPY . .
 
+# Generate Prisma Client
+RUN npx prisma generate
+
 # Run the build step
 RUN npm run build
 
