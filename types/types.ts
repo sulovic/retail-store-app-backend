@@ -1,25 +1,25 @@
 import * as z from "zod";
 
 export const userRolesSchema = z.object({
-  roleId: z.number().optional(),
+  roleId: z.number(),
   roleName: z.string(),
 });
 
 export const storeListSchema = z.object({
-  storeId: z.number().optional(),
+  storeId: z.number(),
   storeName: z.string(),
   storeAddress: z.string(),
 });
 
 export const userSchema = z.object({
-    userId: z.number().optional(),
+    userId: z.number(),
     firstName: z.string(),
     lastName: z.string(),
     email: z.string(),
 })
 
 export const userPublicDataSchema = z.object({
-  userId: z.number().optional(),
+  userId: z.number(),
   firstName: z.string(),
   lastName: z.string(),
   email: z.string().email(),
@@ -30,7 +30,7 @@ export const userPublicDataSchema = z.object({
 export type UserPublicDataType = z.infer<typeof userPublicDataSchema>;
 
 export const authUserSchema = z.object({
-  userId: z.number().optional(),
+  userId: z.number(),
   firstName: z.string(),
   lastName: z.string(),
   email: z.string().email(),
@@ -74,7 +74,7 @@ export const inventorySchema = z.object({
 export type Inventory = z.infer<typeof inventorySchema>;
 
 export const inventoryProductSchema = z.object({
-  inventoryProductId: z.number().optional(),
+  inventoryProductId: z.number(),
   inventoryId: z.number(),
   productPrice: z.number(),
   productQuantity: z.number(),
@@ -85,7 +85,7 @@ export const inventoryProductSchema = z.object({
 export type InventoryProduct = z.infer<typeof inventoryProductSchema>;
 
 export const procurementSchema = z.object({
-    procurementId: z.number().optional(),
+    procurementId: z.number(),
     Products: z.object({productId: z.number(),productName: z.string(),productBarcode: z.string()}),
     productQuantity: z.number(),
     Stores: z.object({storeId: z.number(),storeName: z.string()}),
@@ -102,6 +102,7 @@ export const queryParamsSchema = z.object({
   limit: z.string().optional(),
   page: z.string().optional(),
   search: z.string().optional(),
+  filters: z.record(z.string()).optional()
 });
 
 export type QueryParams = z.infer<typeof queryParamsSchema>;

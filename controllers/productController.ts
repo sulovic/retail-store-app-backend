@@ -7,7 +7,7 @@ const getAllProductsController = async (req: Request, res: Response, next: NextF
   try {
     const queryParams: QueryParams = req?.query as QueryParams;
 
-    const { sortBy, sortOrder, limit, page, search, categoryPath, ...filters } = queryParams;
+    const { sortBy, sortOrder, limit, page, search, ...filters } = queryParams;
 
     const take: number | undefined = limit ? parseInt(limit) : 100; // default to 100 to avoid excessive data
     const skip: number | undefined = page && limit ? (parseInt(page) - 1) * parseInt(limit) : 0;
@@ -41,27 +41,33 @@ const getAllProductsController = async (req: Request, res: Response, next: NextF
     const andConditions: object[] = [];
     const orConditions: object[] = [];
 
-    if (categoryPath) {
-      andConditions.push({
-        Categories: {
-          some: {
-            categoryPath: categoryPath,
-          },
-        },
+    if (filters) {
+      andKeys.forEach((key) => {
+        const value = (filters as Record<string, string>)[key];
+        if (value) {
+          andConditions.push(createCondition(key, value));
+        }
       });
+
+      orKeys.forEach((key) => {
+        const value = (filters as Record<string, string>)[key];
+        if (value) {
+          orConditions.push(createCondition(key, value));
+        }
+      });
+
+      const categoryPath = (filters as Record<string, string>)["categoryPath"];
+
+      if (categoryPath) {
+        andConditions.push({
+          Categories: {
+            some: {
+              categoryPath: categoryPath,
+            },
+          },
+        });
+      }
     }
-
-    andKeys.forEach((key) => {
-      if (filters[key]) {
-        andConditions.push(createCondition(key, filters[key]));
-      }
-    });
-
-    orKeys.forEach((key) => {
-      if (filters[key]) {
-        orConditions.push(createCondition(key, filters[key]));
-      }
-    });
 
     if (search) {
       andConditions.push({
@@ -94,7 +100,7 @@ const getAllProductsCountController = async (req: Request, res: Response, next: 
   try {
     const queryParams: QueryParams = req?.query as QueryParams;
 
-    const { sortBy, sortOrder, limit, page, search, categoryPath, ...filters } = queryParams; // eslint-disable-line @typescript-eslint/no-unused-vars
+    const { sortBy, sortOrder, limit, page, search, ...filters } = queryParams; // eslint-disable-line @typescript-eslint/no-unused-vars
 
     const andKeys = ["productId", "productBarcode"];
     const orKeys: string[] = [];
@@ -119,27 +125,33 @@ const getAllProductsCountController = async (req: Request, res: Response, next: 
     const andConditions: object[] = [];
     const orConditions: object[] = [];
 
-    if (categoryPath) {
-      andConditions.push({
-        Categories: {
-          some: {
-            categoryPath: categoryPath,
-          },
-        },
+    if (filters) {
+      andKeys.forEach((key) => {
+        const value = (filters as Record<string, string>)[key];
+        if (value) {
+          andConditions.push(createCondition(key, value));
+        }
       });
+
+      orKeys.forEach((key) => {
+        const value = (filters as Record<string, string>)[key];
+        if (value) {
+          orConditions.push(createCondition(key, value));
+        }
+      });
+
+      const categoryPath = (filters as Record<string, string>)["categoryPath"];
+
+      if (categoryPath) {
+        andConditions.push({
+          Categories: {
+            some: {
+              categoryPath: categoryPath,
+            },
+          },
+        });
+      }
     }
-
-    andKeys.forEach((key) => {
-      if (filters[key]) {
-        andConditions.push(createCondition(key, filters[key]));
-      }
-    });
-
-    orKeys.forEach((key) => {
-      if (filters[key]) {
-        orConditions.push(createCondition(key, filters[key]));
-      }
-    });
 
     if (search) {
       andConditions.push({

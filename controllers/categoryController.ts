@@ -38,17 +38,21 @@ const getAllCategoriesController = async (req: Request, res: Response, next: Nex
     const andConditions: object[] = [];
     const orConditions: object[] = [];
 
-    andKeys.forEach((key) => {
-      if (filters[key]) {
-        andConditions.push(createCondition(key, filters[key]));
-      }
-    });
-
-    orKeys.forEach((key) => {
-      if (filters[key]) {
-        orConditions.push(createCondition(key, filters[key]));
-      }
-    });
+    if (filters) {
+      andKeys.forEach((key) => {
+        const value = (filters as Record<string, string>)[key]; 
+        if (value) {
+          andConditions.push(createCondition(key, value));
+        }
+      });
+    
+      orKeys.forEach((key) => {
+        const value = (filters as Record<string, string>)[key];
+        if (value) {
+          orConditions.push(createCondition(key, value));
+        }
+      });
+    }
 
     if (search) {
       andConditions.push({
@@ -99,17 +103,21 @@ const getAllCategoriesCountController = async (req: Request, res: Response, next
     const andConditions: object[] = [];
     const orConditions: object[] = [];
 
-    andKeys.forEach((key) => {
-      if (filters[key]) {
-        andConditions.push(createCondition(key, filters[key]));
-      }
-    });
-
-    orKeys.forEach((key) => {
-      if (filters[key]) {
-        orConditions.push(createCondition(key, filters[key]));
-      }
-    });
+    if (filters) {
+      andKeys.forEach((key) => {
+        const value = (filters as Record<string, string>)[key]; 
+        if (value) {
+          andConditions.push(createCondition(key, value));
+        }
+      });
+    
+      orKeys.forEach((key) => {
+        const value = (filters as Record<string, string>)[key];
+        if (value) {
+          orConditions.push(createCondition(key, value));
+        }
+      });
+    }
 
     if (search) {
       andConditions.push({

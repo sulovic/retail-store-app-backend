@@ -43,17 +43,21 @@ const getAllProcurementsController = async (req: AuthenticatedRequest, res: Resp
     const andConditions: object[] = [];
     const orConditions: object[] = [];
 
-    andKeys.forEach((key) => {
-      if (filters[key]) {
-        andConditions.push(createCondition(key, filters[key]));
-      }
-    });
-
-    orKeys.forEach((key) => {
-      if (filters[key]) {
-        orConditions.push(createCondition(key, filters[key]));
-      }
-    });
+    if (filters) {
+      andKeys.forEach((key) => {
+        const value = (filters as Record<string, string>)[key]; 
+        if (value) {
+          andConditions.push(createCondition(key, value));
+        }
+      });
+    
+      orKeys.forEach((key) => {
+        const value = (filters as Record<string, string>)[key];
+        if (value) {
+          orConditions.push(createCondition(key, value));
+        }
+      });
+    }
 
     // Check if the user is authorized to access all procurements, return only their Store procurements otherwise
     if (!req.authUser || req.authUser.UserRoles.roleId < 3000) {
@@ -103,17 +107,21 @@ const getAllProcurementsCountController = async (req: AuthenticatedRequest, res:
     const andConditions: object[] = [];
     const orConditions: object[] = [];
 
-    andKeys.forEach((key) => {
-      if (filters[key]) {
-        andConditions.push(createCondition(key, filters[key]));
-      }
-    });
-
-    orKeys.forEach((key) => {
-      if (filters[key]) {
-        orConditions.push(createCondition(key, filters[key]));
-      }
-    });
+    if (filters) {
+      andKeys.forEach((key) => {
+        const value = (filters as Record<string, string>)[key]; 
+        if (value) {
+          andConditions.push(createCondition(key, value));
+        }
+      });
+    
+      orKeys.forEach((key) => {
+        const value = (filters as Record<string, string>)[key];
+        if (value) {
+          orConditions.push(createCondition(key, value));
+        }
+      });
+    }
 
     // Check if the user is authorized to access all procurements, return only their Store procurements otherwise
     if (!req.authUser || req.authUser.UserRoles.roleId < 3000) {

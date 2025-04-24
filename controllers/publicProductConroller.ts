@@ -7,7 +7,7 @@ const getAllProductsController = async (req: Request, res: Response, next: NextF
   try {
     const queryParams: QueryParams = req?.query as QueryParams;
 
-    const { sortBy, sortOrder, limit, page, search, categoryPath } = queryParams;
+    const { sortBy, sortOrder, limit, page, search, ...filters } = queryParams;
 
     const take: number | undefined = limit ? parseInt(limit) : 100; // default to 100 to avoid excessive data
     const skip: number | undefined = page && limit ? (parseInt(page) - 1) * parseInt(limit) : 0;
@@ -20,14 +20,18 @@ const getAllProductsController = async (req: Request, res: Response, next: NextF
 
     const andConditions: object[] = [];
 
-    if (categoryPath) {
-      andConditions.push({
-        Categories: {
-          some: {
-            categoryPath: categoryPath,
+    if (filters) {
+      const categoryPath = (filters as Record<string, string>)["categoryPath"];
+
+      if (categoryPath) {
+        andConditions.push({
+          Categories: {
+            some: {
+              categoryPath: categoryPath,
+            },
           },
-        },
-      });
+        });
+      }
     }
 
     if (search) {
@@ -60,18 +64,22 @@ const getAllProductsCountController = async (req: Request, res: Response, next: 
   try {
     const queryParams: QueryParams = req?.query as QueryParams;
 
-    const { sortBy, sortOrder, limit, page, search, categoryPath } = queryParams; // eslint-disable-line @typescript-eslint/no-unused-vars
+    const { sortBy, sortOrder, limit, page, search, ...filters } = queryParams; // eslint-disable-line @typescript-eslint/no-unused-vars
 
     const andConditions: object[] = [];
 
-    if (categoryPath) {
-      andConditions.push({
-        Categories: {
-          some: {
-            categoryPath: categoryPath,
+    if (filters) {
+      const categoryPath = (filters as Record<string, string>)["categoryPath"];
+
+      if (categoryPath) {
+        andConditions.push({
+          Categories: {
+            some: {
+              categoryPath: categoryPath,
+            },
           },
-        },
-      });
+        });
+      }
     }
 
     if (search) {
