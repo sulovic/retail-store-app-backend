@@ -1,133 +1,127 @@
-export type UserPublicDataType = {
-  userId: number;
-  firstName: string;
-  lastName: string;
-  email: string;
-  UserRoles: {
-    roleId: number;
-    roleName: string;
-  };
-  Stores: {
-    storeId: number;
-    storeName: string;
-    storeAddress: string;
-  }[];
-};
+import * as z from "zod";
 
-export type AuthUserDataType = {
-  userId: number;
-  firstName: string;
-  lastName: string;
-  email: string;
-  password: string | null;
-  refreshToken: string | null;
-  createdAt: Date;
-  UserRoles: {
-    roleId: number;
-    roleName: string;
-  };
-  Stores: {
-    storeId: number;
-    storeName: string;
-    storeAddress: string;
-  }[];
-};
+export const userRolesSchema = z.object({
+  roleId: z.number().optional(),
+  roleName: z.string(),
+});
 
-export type TokenUserDataType = {
-  userId: number;
-  firstName: string;
-  lastName: string;
-  email: string;
-  UserRoles: {
-    roleId: number;
-    roleName: string;
-  };
-  Stores: {
-    storeId: number;
-    storeName: string;
-    storeAddress: string;
-  }[];
-};
+export const storeListSchema = z.object({
+  storeId: z.number().optional(),
+  storeName: z.string(),
+  storeAddress: z.string(),
+});
 
-export type Store = {
-  storeId: number;
-  storeName: string;
-  storeAddress: string;
-  Users: {
-    userId: number;
-    firstName: string;
-    lastName: string;
-    email: string;
-  }[];
-};
+export const userSchema = z.object({
+    userId: z.number().optional(),
+    firstName: z.string(),
+    lastName: z.string(),
+    email: z.string(),
+})
 
-export type Inventory = {
-  inventoryId: number;
-  inventoryDate: Date;
-  Creator: {
-    userId: number;
-    firstName: string;
-    lastName: string;
-    email: string;
-  };
-  Stores: Store;
-  archived: boolean;
-};
+export const userPublicDataSchema = z.object({
+  userId: z.number().optional(),
+  firstName: z.string(),
+  lastName: z.string(),
+  email: z.string().email(),
+  UserRoles: userRolesSchema,
+  Stores: z.array(storeListSchema),
+});
 
-export type InventoryProduct = {
-  inventoryProductId: number;
-  inventoryId: number;
-  productPrice: number;
-  productQuantity: number;
-  Users: {
-    userId: number;
-    firstName: string;
-    lastName: string;
-  };
-  Products: {
-    productId: number;
-    productName: string;
-  };
-};
+export type UserPublicDataType = z.infer<typeof userPublicDataSchema>;
 
-export type Procurement = {
-  procurementId: number;
-  Products: {
-    productId: number;
-    productName: string;
-    productBarcode: string;
-  }
-  productQuantity: number;
-  Stores: {
-    storeId: number;
-    storeName: string;}
-    Users: {
-    userId: number;
-    firstName: string;
-    lastName: string;
-  };
-  completed: boolean | null;
-  createdAt:  Date;
-};
+export const authUserSchema = z.object({
+  userId: z.number().optional(),
+  firstName: z.string(),
+  lastName: z.string(),
+  email: z.string().email(),
+  password: z.string().nullable(),
+  refreshToken: z.string().nullable(),
+  createdAt: z.date(),
+  UserRoles: userRolesSchema,
+  Stores: z.array(storeListSchema),
+});
 
-export type  QueryParams = {
-  sortBy?: string; 
-  sortOrder?: 'asc' | 'desc'; 
-  limit?: string; 
-  page?: string; 
-  search?: string;
-  [key: string]: string | undefined;
-}
+export type AuthUserDataType = z.infer<typeof authUserSchema>;
 
-export type Product = {
-  productId: number;
-  productBarcode: string;
-  productName: string;
-  productPrice: number;
-  productDesc: string | null;
-  productImage: string | null;
-  Categories: {
-    categoryId: number;
-    categoryName: string;
-  }[];
-};
+export const tokenUserSchema = z.object({
+  userId: z.number(),
+  firstName: z.string(),
+  lastName: z.string(),
+  email: z.string().email(),
+  UserRoles: userRolesSchema,
+  Stores: z.array(storeListSchema),
+});
+
+export type TokenUserDataType = z.infer<typeof tokenUserSchema>;
+
+export const storeSchema = z.object({
+  storeId: z.number().optional(),
+  storeName: z.string(),
+  storeAddress: z.string(),
+  Users: z.array(userSchema)
+});
+
+export type Store = z.infer<typeof storeSchema>;
+
+export const inventorySchema = z.object({
+  inventoryId: z.number().optional(),
+  inventoryDate: z.date(),
+  Creator: userSchema,
+  Stores: storeSchema,
+  archived: z.boolean(),
+});
+
+export type Inventory = z.infer<typeof inventorySchema>;
+
+export const inventoryProductSchema = z.object({
+  inventoryProductId: z.number().optional(),
+  inventoryId: z.number(),
+  productPrice: z.number(),
+  productQuantity: z.number(),
+  Users: z.object({userId: z.number(),firstName: z.string(),lastName: z.string()}),
+  Products: z.object({ productId: z.number(), productName: z.string() }),
+});
+
+export type InventoryProduct = z.infer<typeof inventoryProductSchema>;
+
+export const procurementSchema = z.object({
+    procurementId: z.number().optional(),
+    Products: z.object({productId: z.number(),productName: z.string(),productBarcode: z.string()}),
+    productQuantity: z.number(),
+    Stores: z.object({storeId: z.number(),storeName: z.string()}),
+    Users: z.object({userId: z.number(),firstName: z.string(),lastName: z.string()}),
+    completed: z.boolean().nullable(),
+    createdAt: z.date(),
+  })
+
+export type Procurement = z.infer<typeof procurementSchema>;
+
+export const queryParamsSchema = z.object({
+  sortBy: z.string().optional().optional(),
+  sortOrder: z.enum(['asc', 'desc']).optional(),
+  limit: z.string().optional(),
+  page: z.string().optional(),
+  search: z.string().optional(),
+});
+
+export type QueryParams = z.infer<typeof queryParamsSchema>;
+
+export const productSchema = z.object({
+    productId: z.number().optional(),
+    productBarcode: z.string(),
+    productName: z.string(),
+    productPrice: z.number(),
+    productDesc: z.string().nullable(),
+    productImage: z.string().nullable(),
+    Categories: z.array(z.object({categoryId: z.number(),categoryName: z.string()}))
+})
+
+export type Product = z.infer<typeof productSchema>;
+
+export const Category = z.object({
+  categoryId: z.number().optional(),
+  categoryName: z.string(),
+  categoryPath: z.string(),
+});
+
+export type Category = z.infer<typeof Category>;
