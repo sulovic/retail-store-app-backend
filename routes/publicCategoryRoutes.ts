@@ -5,6 +5,6 @@ const router = Router();
 
 router.get("/", publicCategoryController.getAllCategoriesController);
 router.get("/count", publicCategoryController.getAllCategoriesCountController);
-router.get("/:categoryPath", publicCategoryController.getCategoyrByPathController);
+router.get("/*", publicCategoryController.getCategoyrByPathController);
 
 export default router;
