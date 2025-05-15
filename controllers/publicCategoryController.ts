@@ -22,7 +22,7 @@ const getAllCategoriesCountController = async (req: Request, res: Response, next
 
 const getCategoyrByPathController = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const categoryPath: string = req.params.categoryPath;
+    const categoryPath: string = req.params[0];
     const category: Categories | null = await categoryModel.getCategoryByPath(categoryPath);
     if (category) {
       return res.status(200).json(category);
