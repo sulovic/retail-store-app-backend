@@ -35,6 +35,14 @@ const getCategory = async (categoryId: number): Promise<Categories | null> => {
   });
 };
 
+const getCategoryByPath = async (categoryPath: string): Promise<Categories | null> => {
+  return await prisma.categories.findUnique({
+    where: {
+      categoryPath,
+    },
+  });
+};
+
 const createCategory = async (category: Omit<Categories, "categoryId">): Promise<Categories> => {
   return await prisma.categories.create({
     data: category,
@@ -64,6 +72,7 @@ export default {
   getAllCategories,
   getAllCategoriesCount,
   getCategory,
+  getCategoryByPath,
   createCategory,
   updateCategory,
   deleteCategory,
