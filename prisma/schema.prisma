@@ -38,6 +38,7 @@ model Products {
     productId         Int                 @id @default(autoincrement())
     productBarcode    String              @unique @db.VarChar(64)
     productName       String              @db.VarChar(64)
+    productUrl        String?             @unique @db.VarChar(128)
     productPrice      Float
     productDesc       String?             @db.VarChar(128)
     productImage      String?             @db.VarChar(128)
@@ -116,7 +117,7 @@ model Procurements {
 model Categories {
     categoryId   Int        @id @default(autoincrement())
     categoryName String     @db.VarChar(256)
-    categoryPath String     @db.VarChar(256) @unique
+    categoryPath String     @unique @db.VarChar(256)
     Products     Products[]
 
     @@index([categoryId])

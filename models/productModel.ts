@@ -23,6 +23,7 @@ const getAllProducts = async ({
       productId: true,
       productName: true,
       productBarcode: true,
+      productUrl: true,
       productPrice: true,
       productDesc: true,
       productImage: true,
@@ -30,6 +31,7 @@ const getAllProducts = async ({
         select: {
           categoryId: true,
           categoryName: true,
+          categoryPath: true,
         },
       },
     },
@@ -52,6 +54,7 @@ const getProduct = async (productId: number): Promise<Product | null> => {
       productId: true,
       productName: true,
       productBarcode: true,
+      productUrl: true,
       productPrice: true,
       productDesc: true,
       productImage: true,
@@ -59,6 +62,7 @@ const getProduct = async (productId: number): Promise<Product | null> => {
         select: {
           categoryId: true,
           categoryName: true,
+          categoryPath: true,
         },
       },
     },
@@ -70,15 +74,16 @@ const createProduct = async (product: Omit<Product, "productId">): Promise<Produ
     data: {
       ...product,
       Categories: {
-       connect: product.Categories.map((category) => ({
-         categoryId: category.categoryId,
-       }))
+        connect: product.Categories.map((category) => ({
+          categoryId: category.categoryId,
+        })),
       },
     },
     select: {
       productId: true,
       productName: true,
       productBarcode: true,
+      productUrl: true,
       productPrice: true,
       productDesc: true,
       productImage: true,
@@ -86,6 +91,7 @@ const createProduct = async (product: Omit<Product, "productId">): Promise<Produ
         select: {
           categoryId: true,
           categoryName: true,
+          categoryPath: true,
         },
       },
     },
@@ -111,6 +117,7 @@ const updateProduct = async (product: Product): Promise<Product> => {
       productId: true,
       productName: true,
       productBarcode: true,
+      productUrl: true,
       productPrice: true,
       productDesc: true,
       productImage: true,
@@ -118,6 +125,7 @@ const updateProduct = async (product: Product): Promise<Product> => {
         select: {
           categoryId: true,
           categoryName: true,
+          categoryPath: true,
         },
       },
     },
@@ -139,6 +147,7 @@ const deleteProduct = async (productId: number): Promise<Product> => {
       productId: true,
       productName: true,
       productBarcode: true,
+      productUrl: true,
       productPrice: true,
       productDesc: true,
       productImage: true,
@@ -146,6 +155,7 @@ const deleteProduct = async (productId: number): Promise<Product> => {
         select: {
           categoryId: true,
           categoryName: true,
+          categoryPath: true,
         },
       },
     },
@@ -197,15 +207,19 @@ const bulkUploadProducts = async (products: Omit<Product, "productId">[]): Promi
               })),
             },
           },
-          create: { ...product, Categories: {
-            connect: product.Categories?.map((category) => ({
-              categoryId: category.categoryId,
-            })),
-          }, },
+          create: {
+            ...product,
+            Categories: {
+              connect: product.Categories?.map((category) => ({
+                categoryId: category.categoryId,
+              })),
+            },
+          },
           select: {
             productId: true,
             productName: true,
             productBarcode: true,
+            productUrl: true,
             productPrice: true,
             productDesc: true,
             productImage: true,
@@ -213,6 +227,7 @@ const bulkUploadProducts = async (products: Omit<Product, "productId">[]): Promi
               select: {
                 categoryId: true,
                 categoryName: true,
+                categoryPath: true,
               },
             },
           },

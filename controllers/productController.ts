@@ -24,7 +24,7 @@ const getAllProductsController = async (req: Request, res: Response, next: NextF
     const hasAnyAndKeys = andKeys.some((key) => key in filters);
     const hasAnyOrKeys = orKeys.some((key) => key in filters);
 
-    if (Object.keys(filters).length > 0 && !hasAnyAndKeys && !hasAnyOrKeys) {
+    if (Object.keys(filters).length > 0 && !hasAnyAndKeys && !hasAnyOrKeys && !("categoryPath" in filters)) {
       return res.status(400).json({ message: "Invalid filters provided" });
     }
 
