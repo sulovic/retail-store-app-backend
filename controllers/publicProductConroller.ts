@@ -22,6 +22,13 @@ const getAllProductsController = async (req: Request, res: Response, next: NextF
 
     if (filters) {
       const categoryPath = (filters as Record<string, string>)["categoryPath"];
+      const productUrl = (filters as Record<string, string>)["productUrl"];
+
+      if (productUrl) {
+        andConditions.push({
+          productUrl: productUrl,
+        });
+      }
 
       if (categoryPath) {
         andConditions.push({

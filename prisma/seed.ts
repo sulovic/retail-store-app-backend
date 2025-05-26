@@ -45,9 +45,27 @@ const seedPredefinedData = async () => {
     ];
 
     const testProducts = [
-      { productId: 1, productName: "Test Product 1", productBarcode: "123456789", productPrice: 100 },
-      { productId: 2, productName: "Test Product 2", productBarcode: "12345678", productPrice: 200 },
-      { productId: 3, productName: "Test Product 3", productBarcode: "1234567", productPrice: 300 },
+      {
+        productId: 1,
+        productName: "Test Product 1",
+        productBarcode: "123456789",
+        productPrice: 100,
+        productUrl: "test-product-1",
+      },
+      {
+        productId: 2,
+        productName: "Test Product 2",
+        productBarcode: "12345678",
+        productPrice: 200,
+        productUrl: "test-product-2",
+      },
+      {
+        productId: 3,
+        productName: "Test Product 3",
+        productBarcode: "1234567",
+        productPrice: 300,
+        productUrl: "test-product-3",
+      },
     ];
 
     // Insert UserRoles

@@ -38,7 +38,7 @@ model Products {
     productId         Int                 @id @default(autoincrement())
     productBarcode    String              @unique @db.VarChar(64)
     productName       String              @db.VarChar(64)
-    productUrl        String?             @unique @db.VarChar(128)
+    productUrl        String              @unique @db.VarChar(128)
     productPrice      Float
     productDesc       String?             @db.VarChar(128)
     productImage      String?             @db.VarChar(128)
