@@ -19,7 +19,7 @@ ENV DATABASE_RETAILSTORE_URL=$DATABASE_RETAILSTORE_URL
 COPY package*.json ./
 
 # Install dependencies
-RUN npm ci --omit=dev
+RUN npm ci
 
 # Copy the rest of the application code to the container
 COPY . .
