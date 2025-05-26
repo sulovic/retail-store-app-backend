@@ -119,7 +119,7 @@ export const productSchema = z.object({
   productId: z.number().optional(),
   productBarcode: z.string(),
   productName: z.string(),
-  productUrl: z.string().nullable(),
+  productUrl: z.string(),
   productPrice: z.number(),
   productDesc: z.string().nullable(),
   productImage: z.string().nullable(),
