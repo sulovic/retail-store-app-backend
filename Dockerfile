@@ -19,7 +19,7 @@ ENV DATABASE_RETAILSTORE_URL=$DATABASE_RETAILSTORE_URL
 COPY package*.json ./
 
 # Install dependencies
-RUN npm install && npm install nodemon --save-dev
+RUN npm ci --omit=dev
 
 # Copy the rest of the application code to the container
 COPY . .
