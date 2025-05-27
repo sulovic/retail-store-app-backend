@@ -51,6 +51,7 @@ const seedPredefinedData = async () => {
         productBarcode: "123456789",
         productPrice: 100,
         productUrl: "test-product-1",
+        productDesc: "Test Product 1 Description",
       },
       {
         productId: 2,
@@ -58,6 +59,7 @@ const seedPredefinedData = async () => {
         productBarcode: "12345678",
         productPrice: 200,
         productUrl: "test-product-2",
+        productDesc: "Test Product 2 Description",
       },
       {
         productId: 3,
@@ -65,7 +67,15 @@ const seedPredefinedData = async () => {
         productBarcode: "1234567",
         productPrice: 300,
         productUrl: "test-product-3",
+        productDesc: "Test Product 3 Description",
       },
+    ];
+
+    const testCategories = [
+      { categoryId: 1, categoryName: "Test Category 1", categoryPath: "test-category-1" },
+      { categoryId: 2, categoryName: "Test Category 2", categoryPath: "test-category-2" },
+      { categoryId: 3, categoryName: "Test Category 3", categoryPath: "test-category-1/test-category-3" },
+      { categoryId: 4, categoryName: "Test Category 4", categoryPath: "test-category-1/test-category-4" },
     ];
 
     // Insert UserRoles
@@ -143,6 +153,15 @@ const seedPredefinedData = async () => {
         where: { productId: product.productId },
         update: {},
         create: product,
+      });
+    }
+
+    // Insert Test Categories
+    for (const category of testCategories) {
+      await prisma.categories.upsert({
+        where: { categoryId: category.categoryId },
+        update: {},
+        create: category,
       });
     }
 
